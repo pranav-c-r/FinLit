@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { leaderboard } from '../data/mockData';
-import './Leaderboard.css';
+
 
 const Leaderboard = () => {
   const { state } = useApp();
@@ -14,27 +14,27 @@ const Leaderboard = () => {
   const userRank = getUserRank();
 
   return (
-    <div className="leaderboard-page">
+    <div className="p-4 md:p-8">
       <div className="page-header">
         <h1>Leaderboard</h1>
         <p>Compete with other users and climb the ranks</p>
       </div>
 
       {userRank && (
-        <div className="user-rank card mb-2">
+        <div className="card mb-8">
           <h2 className="section-title">Your Rank</h2>
-          <div className="rank-card highlighted">
-            <span className="rank-number">#{userRank}</span>
+          <div className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 p-4 bg-white rounded-lg border-l-4 border-duolingo-green bg-duolingo-green-light-transparent md:grid-cols-1 md:text-center md:gap-2">
+            <span className="text-gray-700 font-semibold">#{userRank}</span>
             <span className="rank-name">{user.name}</span>
-            <span className="rank-level">Level {user.level}</span>
-            <span className="rank-xp">{user.xp} XP</span>
+            <span className="text-duolingo-light-green">Level {user.level}</span>
+            <span className="text-duolingo-green">{user.xp} XP</span>
           </div>
         </div>
       )}
 
-      <div className="leaderboard-list card">
+      <div className="card">
         <h2 className="section-title">Top Financiers</h2>
-        <div className="leaderboard-header grid grid-4">
+        <div className="grid grid-cols-4 p-4 font-semibold text-duolingo-green border-b border-gray-700 mb-2 md:grid-cols-2 md:grid-rows-2 md:gap-2">
           <span>Rank</span>
           <span>Name</span>
           <span>Level</span>
@@ -45,7 +45,7 @@ const Leaderboard = () => {
           {leaderboard.map(entry => (
             <div 
               key={entry.rank} 
-              className={`leaderboard-entry grid grid-4 ${entry.name === user.name ? 'highlighted' : ''}`}
+              className={`grid grid-cols-4 p-4 rounded-md mb-2 items-center md:grid-cols-2 md:grid-rows-2 md:gap-2 ${entry.name === user.name ? 'bg-duolingo-green-light-transparent border-l-4 border-duolingo-green' : 'odd:bg-gray-100'}`}
             >
               <span className="rank-number">#{entry.rank}</span>
               <span className="rank-name">{entry.name}</span>

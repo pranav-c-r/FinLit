@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import './Header.css';
+
 
 const Header = () => {
   const { state } = useApp();
@@ -9,31 +9,31 @@ const Header = () => {
   const progress = (user.xp / user.nextLevelXp) * 100;
 
   return (
-    <header className="header">
-      <div className="container flex-between">
-        <div className="logo">
-          <h1>FinLit</h1>
+    <header className="bg-gray-900 p-4 border-b border-gray-700 sticky top-0 z-50">
+      <div className="container mx-auto flex justify-between items-center">
+        <div className="text-finlit-blue-light text-2xl font-bold">
+          FinLit
         </div>
         
-        <div className="user-info flex gap-1">
-          <div className="user-level">
-            <div className="level-badge">Lvl {user.level}</div>
+        <div className="flex items-center space-x-4">
+          <div>
+            <span className="bg-orange-500 text-gray-900 px-3 py-1 rounded-full font-semibold text-sm">Lvl {user.level}</span>
           </div>
           
-          <div className="user-stats">
-            <div className="xp-progress">
-              <div className="progress-bar">
+          <div className="hidden md:flex items-center space-x-4">
+            <div className="flex flex-col items-end space-y-1">
+              <div className="w-32 h-2 bg-gray-700 rounded-full overflow-hidden">
                 <div 
-                  className="progress-fill" 
+                  className="h-full bg-green-400 rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
-              <div className="xp-text">
+              <div className="text-xs text-gray-400">
                 {user.xp} / {user.nextLevelXp} XP
               </div>
             </div>
             
-            <div className="coins flex-center gap-1">
+            <div className="bg-cyan-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1">
               <span className="coin-icon">🪙</span>
               <span>{user.coins}</span>
             </div>

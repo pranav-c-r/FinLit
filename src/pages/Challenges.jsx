@@ -2,7 +2,7 @@ import React from 'react';
 import { useApp } from '../context/AppContext';
 import ChallengeCard from '../components/challenges/ChallengeCard';
 import { challenges } from '../data/mockData';
-import './Challenges.css';
+
 
 const Challenges = () => {
   const { state } = useApp();
@@ -11,7 +11,7 @@ const Challenges = () => {
   const categories = [...new Set(challenges.map(challenge => challenge.category))];
 
   return (
-    <div className="challenges-page">
+    <div className="p-4 md:p-8">
       <div className="page-header">
         <h1>Financial Challenges</h1>
         <p>Test your knowledge with real-world financial challenges</p>
@@ -19,7 +19,7 @@ const Challenges = () => {
 
       <div className="categories-section mb-2">
         <h2 className="section-title">Categories</h2>
-        <div className="categories-grid grid grid-3 gap-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map(category => (
             <div key={category} className="category-card card">
               <h3>{category}</h3>
@@ -31,7 +31,7 @@ const Challenges = () => {
 
       <div className="all-challenges-section">
         <h2 className="section-title">All Challenges</h2>
-        <div className="challenges-grid grid grid-2 gap-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {challenges.map(challenge => (
             <ChallengeCard 
               key={challenge.id} 

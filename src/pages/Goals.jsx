@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import GoalCard from '../components/goals/GoalCard';
 import GoalForm from '../components/goals/GoalForm';
-import './Goals.css';
+
 
 const Goals = () => {
   const { state } = useApp();
@@ -10,7 +10,7 @@ const Goals = () => {
   const [showForm, setShowForm] = useState(false);
 
   return (
-    <div className="goals-page">
+    <div className="p-4 md:p-8">
       <div className="page-header flex-between">
         <div>
           <h1>Financial Goals</h1>
@@ -31,10 +31,10 @@ const Goals = () => {
       )}
 
       {user.goals.length === 0 ? (
-        <div className="empty-state card">
-          <div className="empty-icon">🎯</div>
-          <h3>No goals yet</h3>
-          <p>Create your first financial goal to get started</p>
+        <div className="card text-center p-12">
+          <div className="text-6xl mb-4">🎯</div>
+          <h3 className="text-green-500 text-2xl font-semibold mb-2">No goals yet</h3>
+          <p className="text-gray-500 mb-6">Create your first financial goal to get started</p>
           <button 
             className="btn btn-primary"
             onClick={() => setShowForm(true)}
@@ -43,7 +43,7 @@ const Goals = () => {
           </button>
         </div>
       ) : (
-        <div className="goals-grid grid grid-2 gap-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {user.goals.map(goal => (
             <GoalCard key={goal.id} goal={goal} />
           ))}

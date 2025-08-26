@@ -6,7 +6,7 @@ import ProgressChart from '../components/dashboard/ProgressChart';
 import LessonCard from '../components/lessons/LessonCard';
 import ChallengeCard from '../components/challenges/ChallengeCard';
 import { lessons, challenges } from '../data/mockData';
-import './Home.css';
+
 
 const Home = () => {
   const { state } = useApp();
@@ -17,13 +17,13 @@ const Home = () => {
   const featuredChallenges = challenges.slice(0, 3);
 
   return (
-    <div className="home-page">
+    <div className="p-4 md:p-8">
       <div className="page-header">
         <h1>Welcome back, {user.name}!</h1>
         <p>Continue your financial literacy journey</p>
       </div>
 
-      <div className="stats-grid grid grid-2 gap-2 mb-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <StatsCard 
           title="Current Level" 
           value={user.level} 
@@ -52,7 +52,7 @@ const Home = () => {
           <Link to="/lessons" className="see-all">See all</Link>
         </div>
         
-        <div className="lessons-grid grid grid-2 gap-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {featuredLessons.map(lesson => (
             <LessonCard 
               key={lesson.id} 
@@ -69,7 +69,7 @@ const Home = () => {
           <Link to="/challenges" className="see-all">See all</Link>
         </div>
         
-        <div className="challenges-grid grid grid-2 gap-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {featuredChallenges.map(challenge => (
             <ChallengeCard 
               key={challenge.id} 

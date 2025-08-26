@@ -1,15 +1,15 @@
 export const colors = {
-  primary: '#9CFFFA',
-  secondary: '#ACF39D',
-  accent: '#DC965A',
-  dark: '#545F66',
-  darker: '#187795',
-  background: '#121212',
-  surface: '#1E1E1E',
+  primary: '#58cc02', // Duolingo green
+  secondary: '#89e219', // Duolingo light green
+  accent: '#4b4b4b', // Duolingo dark grey
+  dark: '#4b4b4b', // Duolingo dark grey
+  darker: '#4b4b4b', // Duolingo dark grey
+  background: '#ffffff', // Duolingo white
+  surface: '#ffffff', // Duolingo white
   text: {
-    primary: '#FFFFFF',
-    secondary: 'rgba(255, 255, 255, 0.7)',
-    disabled: 'rgba(255, 255, 255, 0.5)',
+    primary: '#4b4b4b', // Duolingo dark grey
+    secondary: 'rgba(75, 75, 75, 0.7)',
+    disabled: 'rgba(75, 75, 75, 0.5)',
   }
 };
 

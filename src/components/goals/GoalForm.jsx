@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import './GoalForm.css';
+
 
 const GoalForm = ({ onClose }) => {
   const { dispatch } = useApp();
@@ -38,35 +38,37 @@ const GoalForm = ({ onClose }) => {
   };
 
   return (
-    <form className="goal-form" onSubmit={handleSubmit}>
-      <h3>Create New Goal</h3>
+    <form className="p-6 bg-gray-800 rounded-lg shadow-lg" onSubmit={handleSubmit}>
+      <h3 className="text-finlit-blue-light mb-6 text-center text-2xl font-semibold">Create New Goal</h3>
       
-      <div className="form-group">
-        <label htmlFor="title">Goal Title</label>
+      <div className="mb-4">
+        <label htmlFor="title" className="block mb-2 text-white text-opacity-80 font-medium">Goal Title</label>
         <input
-          type="text"
-          id="title"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          required
-        />
+            type="text"
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
+          />
       </div>
       
-      <div className="form-group">
-        <label htmlFor="description">Description</label>
+      <div className="mb-4">
+        <label htmlFor="description" className="block mb-2 text-white text-opacity-80 font-medium">Description</label>
         <textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          rows="3"
-        />
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows="3"
+            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
+          />
       </div>
       
-      <div className="form-row grid grid-2 gap-1">
-        <div className="form-group">
-          <label htmlFor="targetAmount">Target Amount ($)</label>
+      <div className="mb-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mb-4">
+          <label htmlFor="targetAmount" className="block mb-2 text-white text-opacity-80 font-medium">Target Amount ($)</label>
           <input
             type="number"
             id="targetAmount"
@@ -75,11 +77,12 @@ const GoalForm = ({ onClose }) => {
             onChange={handleChange}
             required
             min="1"
+            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
           />
         </div>
         
-        <div className="form-group">
-          <label htmlFor="currentAmount">Current Amount ($)</label>
+        <div className="mb-4">
+          <label htmlFor="currentAmount" className="block mb-2 text-white text-opacity-80 font-medium">Current Amount ($)</label>
           <input
             type="number"
             id="currentAmount"
@@ -87,29 +90,32 @@ const GoalForm = ({ onClose }) => {
             value={formData.currentAmount}
             onChange={handleChange}
             min="0"
+            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
           />
         </div>
       </div>
       
-      <div className="form-row grid grid-2 gap-1">
-        <div className="form-group">
-          <label htmlFor="deadline">Deadline</label>
+      <div className="mb-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mb-4">
+          <label htmlFor="deadline" className="block mb-2 text-white text-opacity-80 font-medium">Deadline</label>
           <input
             type="date"
             id="deadline"
             name="deadline"
             value={formData.deadline}
             onChange={handleChange}
+            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
           />
         </div>
         
-        <div className="form-group">
-          <label htmlFor="priority">Priority</label>
+        <div className="mb-4">
+          <label htmlFor="priority" className="block mb-2 text-white text-opacity-80 font-medium">Priority</label>
           <select
             id="priority"
             name="priority"
             value={formData.priority}
             onChange={handleChange}
+            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
           >
             <option value="high">High</option>
             <option value="medium">Medium</option>
@@ -118,11 +124,11 @@ const GoalForm = ({ onClose }) => {
         </div>
       </div>
       
-      <div className="form-actions">
-        <button type="button" className="btn btn-secondary" onClick={onClose}>
+      <div className="flex justify-end gap-4 mt-6">
+        <button type="button" className="px-6 py-3 rounded-md text-white bg-gray-600 hover:bg-gray-700 transition duration-200" onClick={onClose}>
           Cancel
         </button>
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="px-6 py-3 rounded-md text-white bg-finlit-blue-light hover:bg-finlit-blue-dark transition duration-200">
           Create Goal
         </button>
       </div>
