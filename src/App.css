@@ -1,7 +1,6 @@
 .App {
   min-height: 100vh;
-  background-color: #121212;
-  color: #FFFFFF;
+  color: #4b4b4b; /* Duolingo dark grey */
 }
 
 .main-content {
