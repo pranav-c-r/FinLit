@@ -1,0 +1,38 @@
+.lessons-page {
+  padding: 1rem 0;
+}
+
+.categories-grid {
+  margin-bottom: 2rem;
+}
+
+.category-card {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+}
+
+.category-card h3 {
+  color: #9CFFFA;
+  margin-bottom: 0.5rem;
+}
+
+.category-card p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .lessons-grid {
+    grid-template-columns: 1fr;
+  }
+}

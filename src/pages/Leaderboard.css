@@ -1,0 +1,89 @@
+.leaderboard-page {
+  padding: 1rem 0;
+}
+
+.user-rank {
+  padding: 1.5rem;
+}
+
+.rank-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #2A2A2A;
+  border-radius: 8px;
+}
+
+.rank-card.highlighted {
+  background-color: rgba(156, 255, 250, 0.1);
+  border-left: 4px solid #9CFFFA;
+}
+
+.leaderboard-list {
+  padding: 1.5rem;
+}
+
+.leaderboard-header {
+  padding: 1rem;
+  font-weight: 600;
+  color: #9CFFFA;
+  border-bottom: 1px solid #545F66;
+  margin-bottom: 0.5rem;
+}
+
+.leaderboard-entry {
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.leaderboard-entry:nth-child(odd) {
+  background-color: #2A2A2A;
+}
+
+.leaderboard-entry.highlighted {
+  background-color: rgba(156, 255, 250, 0.1);
+  border-left: 4px solid #9CFFFA;
+}
+
+.rank-number {
+  color: #DC965A;
+  font-weight: 600;
+}
+
+.rank-name {
+  font-weight: 500;
+}
+
+.rank-level {
+  color: #ACF39D;
+}
+
+.rank-xp {
+  color: #9CFFFA;
+}
+
+@media (max-width: 768px) {
+  .rank-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .leaderboard-header,
+  .leaderboard-entry {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  
+  .leaderboard-header span:nth-child(3),
+  .leaderboard-header span:nth-child(4),
+  .leaderboard-entry span:nth-child(3),
+  .leaderboard-entry span:nth-child(4) {
+    text-align: right;
+  }
+}
