@@ -8,7 +8,7 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #121212;
+  background-color: #1B1B3A;
   color: #FFFFFF;
   line-height: 1.6;
 }
@@ -98,30 +98,31 @@ body {
 }
 
 .btn-primary {
-  background-color: #9CFFFA;
-  color: #121212;
+  background-color: #80A1C1;
+  color: #FFFFFF;
 }
 
 .btn-primary:hover {
-  background-color: #7ae0da;
+  background-color: #6B8BA8;
   transform: translateY(-2px);
 }
 
 .btn-secondary {
-  background-color: #ACF39D;
-  color: #121212;
+  background-color: #F4E87C;
+  color: #1B1B3A;
 }
 
 .btn-secondary:hover {
-  background-color: #8cd67d;
+  background-color: #F0DC5C;
   transform: translateY(-2px);
 }
 
 .card {
-  background-color: #1E1E1E;
+  background-color: #252547;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(128, 161, 193, 0.1);
 }
 
 .page-header {
@@ -131,7 +132,7 @@ body {
 .section-title {
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
-  color: #9CFFFA;
+  color: #80A1C1;
 }
 
 /* Animation classes */

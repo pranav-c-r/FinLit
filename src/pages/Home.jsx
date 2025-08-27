@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import StatsCard from '../components/dashboard/StatsCard';
@@ -7,75 +7,156 @@ import LessonCard from '../components/lessons/LessonCard';
 import ChallengeCard from '../components/challenges/ChallengeCard';
 import { lessons, challenges } from '../data/mockData';
 
-
 const Home = () => {
   const { state } = useApp();
   const { user } = state;
+  const headerRef = useRef(null);
 
   // Get first 3 lessons and challenges
   const featuredLessons = lessons.slice(0, 3);
   const featuredChallenges = challenges.slice(0, 3);
 
+  useEffect(() => {
+    // Add animation class to header after component mounts
+    if (headerRef.current) {
+      setTimeout(() => {
+        headerRef.current.classList.remove('opacity-0', '-translate-y-5');
+        headerRef.current.classList.add('opacity-100', 'translate-y-0');
+      }, 100);
+    }
+  }, []);
+
   return (
-    <div className="p-4 md:p-8">
-      <div className="page-header">
-        <h1>Welcome back, {user.name}!</h1>
-        <p>Continue your financial literacy journey</p>
+    <div className="min-h-screen bg-[#01110A] p-4 md:p-8 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute w-72 h-72 bg-[#80A1C1] rounded-full -top-36 -left-36 opacity-20 animate-pulse"></div>
+        <div className="absolute w-96 h-96 bg-[#F4E87C] rounded-full -bottom-48 -right-48 opacity-10 animate-ping animate-delay-1000"></div>
+        <div className="absolute w-64 h-64 bg-[#80A1C1] rounded-full top-1/4 -right-32 opacity-15 animate-pulse animate-delay-2000"></div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <StatsCard 
-          title="Current Level" 
-          value={user.level} 
-          icon="🎯" 
-          color="#DC965A" 
-        />
-        <StatsCard 
-          title="FinCoins" 
-          value={user.coins} 
-          icon="🪙" 
-          color="#ACF39D" 
-        />
+      {/* Header with animation */}
+      <div ref={headerRef} className="relative z-10 mb-8 transition-all duration-700 ease-out opacity-0 -translate-y-5">
+        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#F4E87C] to-[#80A1C1] bg-clip-text text-transparent">
+          Welcome back, <span className="text-white">{user.name}!</span>
+        </h1>
+        <p className="text-[#80A1C1] mt-2">Continue your financial literacy journey</p>
+        <div className="flex items-center mt-4">
+          <div className="h-1 w-12 bg-[#F4E87C] rounded-full mr-2"></div>
+          <div className="h-1 w-6 bg-[#80A1C1] rounded-full mr-2"></div>
+          <div className="h-1 w-3 bg-[#80A1C1] rounded-full"></div>
+        </div>
       </div>
 
-      <div className="progress-section card mb-2">
-        <h2 className="section-title">Your Progress</h2>
-        <ProgressChart 
-          xp={user.xp} 
-          nextLevelXp={user.nextLevelXp} 
-        />
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative z-10">
+        <div className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-1">
+          <StatsCard 
+            title="Current Level" 
+            value={user.level} 
+            icon="🎯" 
+            color="#F4E87C" 
+            delay={0.1}
+          />
+        </div>
+        <div className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-1">
+          <StatsCard 
+            title="FinCoins" 
+            value={user.coins} 
+            icon="🪙" 
+            color="#80A1C1" 
+            delay={0.2}
+          />
+        </div>
       </div>
 
-      <div className="featured-section mb-2">
-        <div className="section-header flex-between mb-1">
-          <h2 className="section-title">Continue Learning</h2>
-          <Link to="/lessons" className="see-all">See all</Link>
+      {/* Progress Section with 3D effect */}
+      <div className="relative z-10 mb-8 transform transition-all duration-500 hover:shadow-2xl">
+        <div className="bg-[#0A1F14] rounded-2xl p-6 border border-[#1C3B2A] shadow-lg">
+          <h2 className="text-xl font-semibold text-[#F4E87C] mb-4">Your Progress</h2>
+          <ProgressChart 
+            xp={user.xp} 
+            nextLevelXp={user.nextLevelXp} 
+          />
+        </div>
+      </div>
+
+      {/* Featured Lessons */}
+      <div className="relative z-10 mb-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-white relative inline-block">
+            Continue Learning
+            <span className="absolute bottom-0 left-0 w-full h-1 bg-[#F4E87C] rounded-full"></span>
+          </h2>
+          <Link 
+            to="/lessons" 
+            className="flex items-center text-[#80A1C1] hover:text-[#F4E87C] transition-colors duration-300 group"
+          >
+            <span className="mr-2">See all</span>
+            <svg 
+              className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </Link>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {featuredLessons.map(lesson => (
-            <LessonCard 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredLessons.map((lesson, index) => (
+            <div 
               key={lesson.id} 
-              lesson={lesson} 
-              completed={user.completedLessons.includes(lesson.id)}
-            />
+              className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-2"
+              style={{ transitionDelay: `${index * 100}ms` }}
+            >
+              <LessonCard 
+                lesson={lesson} 
+                completed={user.completedLessons.includes(lesson.id)}
+              />
+            </div>
           ))}
         </div>
       </div>
 
-      <div className="featured-section">
-        <div className="section-header flex-between mb-1">
-          <h2 className="section-title">Active Challenges</h2>
-          <Link to="/challenges" className="see-all">See all</Link>
+      {/* Featured Challenges */}
+      <div className="relative z-10">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-white relative inline-block">
+            Active Challenges
+            <span className="absolute bottom-0 left-0 w-full h-1 bg-[#F4E87C] rounded-full"></span>
+          </h2>
+          <Link 
+            to="/challenges" 
+            className="flex items-center text-[#80A1C1] hover:text-[#F4E87C] transition-colors duration-300 group"
+          >
+            <span className="mr-2">See all</span>
+            <svg 
+              className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </Link>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {featuredChallenges.map(challenge => (
-            <ChallengeCard 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredChallenges.map((challenge, index) => (
+            <div 
               key={challenge.id} 
-              challenge={challenge} 
-              completed={user.completedChallenges.includes(challenge.id)}
-            />
+              className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-2"
+              style={{ transitionDelay: `${index * 100}ms` }}
+            >
+              <ChallengeCard 
+                challenge={challenge} 
+                completed={user.completedChallenges.includes(challenge.id)}
+              />
+            </div>
           ))}
         </div>
       </div>

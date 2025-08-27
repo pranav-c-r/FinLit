@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 
-
 const GoalForm = ({ onClose }) => {
   const { dispatch } = useApp();
   const [formData, setFormData] = useState({
@@ -38,37 +37,37 @@ const GoalForm = ({ onClose }) => {
   };
 
   return (
-    <form className="p-6 bg-gray-800 rounded-lg shadow-lg" onSubmit={handleSubmit}>
-      <h3 className="text-finlit-blue-light mb-6 text-center text-2xl font-semibold">Create New Goal</h3>
+    <form className="bg-[#0A1F14] rounded-2xl p-6 border border-[#1C3B2A] shadow-xl" onSubmit={handleSubmit}>
+      <h3 className="text-[#F4E87C] mb-6 text-center text-2xl font-semibold">Create New Goal</h3>
       
       <div className="mb-4">
-        <label htmlFor="title" className="block mb-2 text-white text-opacity-80 font-medium">Goal Title</label>
+        <label htmlFor="title" className="block mb-2 text-[#80A1C1] font-medium">Goal Title</label>
         <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
-          />
+          type="text"
+          id="title"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          required
+          className="w-full p-3 border border-[#1C3B2A] rounded-xl bg-[#0C291C] text-white focus:outline-none focus:border-[#80A1C1] transition-colors duration-300"
+        />
       </div>
       
       <div className="mb-4">
-        <label htmlFor="description" className="block mb-2 text-white text-opacity-80 font-medium">Description</label>
+        <label htmlFor="description" className="block mb-2 text-[#80A1C1] font-medium">Description</label>
         <textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows="3"
-            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
-          />
+          id="description"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          rows="3"
+          className="w-full p-3 border border-[#1C3B2A] rounded-xl bg-[#0C291C] text-white focus:outline-none focus:border-[#80A1C1] transition-colors duration-300"
+        />
       </div>
       
-      <div className="mb-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="mb-4">
-          <label htmlFor="targetAmount" className="block mb-2 text-white text-opacity-80 font-medium">Target Amount ($)</label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label htmlFor="targetAmount" className="block mb-2 text-[#80A1C1] font-medium">Target Amount ($)</label>
           <input
             type="number"
             id="targetAmount"
@@ -77,12 +76,12 @@ const GoalForm = ({ onClose }) => {
             onChange={handleChange}
             required
             min="1"
-            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
+            className="w-full p-3 border border-[#1C3B2A] rounded-xl bg-[#0C291C] text-white focus:outline-none focus:border-[#80A1C1] transition-colors duration-300"
           />
         </div>
         
-        <div className="mb-4">
-          <label htmlFor="currentAmount" className="block mb-2 text-white text-opacity-80 font-medium">Current Amount ($)</label>
+        <div>
+          <label htmlFor="currentAmount" className="block mb-2 text-[#80A1C1] font-medium">Current Amount ($)</label>
           <input
             type="number"
             id="currentAmount"
@@ -90,32 +89,32 @@ const GoalForm = ({ onClose }) => {
             value={formData.currentAmount}
             onChange={handleChange}
             min="0"
-            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
+            className="w-full p-3 border border-[#1C3B2A] rounded-xl bg-[#0C291C] text-white focus:outline-none focus:border-[#80A1C1] transition-colors duration-300"
           />
         </div>
       </div>
       
-      <div className="mb-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="mb-4">
-          <label htmlFor="deadline" className="block mb-2 text-white text-opacity-80 font-medium">Deadline</label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label htmlFor="deadline" className="block mb-2 text-[#80A1C1] font-medium">Deadline</label>
           <input
             type="date"
             id="deadline"
             name="deadline"
             value={formData.deadline}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
+            className="w-full p-3 border border-[#1C3B2A] rounded-xl bg-[#0C291C] text-white focus:outline-none focus:border-[#80A1C1] transition-colors duration-300"
           />
         </div>
         
-        <div className="mb-4">
-          <label htmlFor="priority" className="block mb-2 text-white text-opacity-80 font-medium">Priority</label>
+        <div>
+          <label htmlFor="priority" className="block mb-2 text-[#80A1C1] font-medium">Priority</label>
           <select
             id="priority"
             name="priority"
             value={formData.priority}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-600 rounded-md bg-gray-800 text-white font-poppins focus:outline-none focus:border-finlit-blue-light"
+            className="w-full p-3 border border-[#1C3B2A] rounded-xl bg-[#0C291C] text-white focus:outline-none focus:border-[#80A1C1] transition-colors duration-300"
           >
             <option value="high">High</option>
             <option value="medium">Medium</option>
@@ -124,11 +123,18 @@ const GoalForm = ({ onClose }) => {
         </div>
       </div>
       
-      <div className="flex justify-end gap-4 mt-6">
-        <button type="button" className="px-6 py-3 rounded-md text-white bg-gray-600 hover:bg-gray-700 transition duration-200" onClick={onClose}>
+      <div className="flex justify-end gap-4">
+        <button 
+          type="button" 
+          className="px-6 py-3 rounded-xl text-white bg-[#1C3B2A] hover:bg-[#2A4D3A] transition duration-300 transform hover:scale-105"
+          onClick={onClose}
+        >
           Cancel
         </button>
-        <button type="submit" className="px-6 py-3 rounded-md text-white bg-finlit-blue-light hover:bg-finlit-blue-dark transition duration-200">
+        <button 
+          type="submit" 
+          className="px-6 py-3 rounded-xl text-white bg-gradient-to-r from-[#80A1C1] to-[#5C7A9E] hover:from-[#5C7A9E] hover:to-[#4A6380] transition duration-300 transform hover:scale-105"
+        >
           Create Goal
         </button>
       </div>

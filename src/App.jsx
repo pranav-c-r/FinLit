@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import Header from './components/layout/Header';
+import Sidebar from './components/layout/Sidebar';
 import Navigation from './components/layout/Navigation';
 import Home from './pages/Home';
 import Lessons from './pages/Lessons';
@@ -18,17 +19,20 @@ function App() {
     <AppProvider>
       <Router>
         <div className="App">
-          <Header />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/lessons" element={<Lessons />} />
-              <Route path="/challenges" element={<Challenges />} />
-              <Route path="/goals" element={<Goals />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-              <Route path="/profile" element={<Profile />} />
-            </Routes>
-          </main>
+          <Sidebar />
+          <div className="app-content">
+            <Header />
+            <main className="main-content">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/lessons" element={<Lessons />} />
+                <Route path="/challenges" element={<Challenges />} />
+                <Route path="/goals" element={<Goals />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/profile" element={<Profile />} />
+              </Routes>
+            </main>
+          </div>
           <Navigation />
         </div>
       </Router>
