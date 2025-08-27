@@ -8,7 +8,7 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #1B1B3A;
+  background-color: #01110A;
   color: #FFFFFF;
   line-height: 1.6;
 }
@@ -90,7 +90,7 @@ body {
 .btn {
   padding: 0.8rem 1.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -98,31 +98,33 @@ body {
 }
 
 .btn-primary {
-  background-color: #80A1C1;
+  background: linear-gradient(to right, #80A1C1, #5C7A9E);
   color: #FFFFFF;
 }
 
 .btn-primary:hover {
-  background-color: #6B8BA8;
+  background: linear-gradient(to right, #5C7A9E, #4A6380);
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(128, 161, 193, 0.3);
 }
 
 .btn-secondary {
-  background-color: #F4E87C;
-  color: #1B1B3A;
+  background: linear-gradient(to right, #F4E87C, #D9C85B);
+  color: #01110A;
 }
 
 .btn-secondary:hover {
-  background-color: #F0DC5C;
+  background: linear-gradient(to right, #D9C85B, #C5B350);
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(244, 232, 124, 0.3);
 }
 
 .card {
-  background-color: #252547;
-  border-radius: 12px;
+  background-color: #0A1F14;
+  border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(128, 161, 193, 0.1);
+  border: 1px solid #1C3B2A;
 }
 
 .page-header {
@@ -152,4 +154,65 @@ body {
 @keyframes slideIn {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.animate-ping {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A1F14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #80A1C1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5C7A9E;
 }
