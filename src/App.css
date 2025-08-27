@@ -1,15 +1,15 @@
+/* Base App Styles */
 .App {
-  min-height: 100vh;
   color: #FFFFFF;
   background-color: #1B1B3A;
   display: flex;
+  flex-direction: column;
 }
 
 .app-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
 
 .main-content {
@@ -20,21 +20,19 @@
   width: 100%;
 }
 
-/* Desktop layout with sidebar */
-@media (min-width: 769px) {
-  .app-content {
-    margin-left: 280px;
-  }
-  
-  .main-content {
-    padding: 2rem 2rem 2rem;
-  }
+/* Public pages override - higher specificity */
+.main-content.public-layout {
+  max-width: none !important;
+  margin: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
-/* Mobile layout */
+/* Mobile layout (base - mobile first) */
 @media (max-width: 768px) {
   .App {
-    display: block;
+    display: flex; /* Keep flex instead of block */
+    flex-direction: column;
   }
   
   .app-content {
@@ -46,9 +44,24 @@
   }
 }
 
-/* Tablet adjustments */
+/* Tablet layout */
 @media (min-width: 769px) and (max-width: 1024px) {
+  .app-content {
+    margin-left: 280px;
+  }
+  
   .main-content {
     padding: 2rem 1.5rem 2rem;
+  }
+}
+
+/* Desktop layout */
+@media (min-width: 1025px) {
+  .app-content {
+    margin-left: 280px;
+  }
+  
+  .main-content {
+    padding: 2rem 2rem 2rem;
   }
 }
