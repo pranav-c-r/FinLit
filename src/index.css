@@ -1,7 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 
 * {
   margin: 0;
@@ -11,12 +12,38 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  color: #4b4b4b; /* Duolingo dark grey */
+  color: white;
   line-height: 1.6;
+  background-color: theme('colors.background.DEFAULT');
+  overflow-x: hidden;
 }
 
 #root {
   min-height: 100vh;
+  position: relative;
+}
+
+/* Animated Background Element Classes */
+.bg-blob-1 {
+  @apply absolute w-[600px] h-[600px] bg-primary-light/20 rounded-full blur-3xl -top-40 -left-40 animate-pulse-slow;
+}
+
+.bg-blob-2 {
+  @apply absolute w-[400px] h-[400px] bg-primary/20 rounded-full blur-2xl -bottom-32 -right-32 animate-pulse-slower;
+}
+
+.bg-blob-3 {
+  @apply absolute w-[200px] h-[200px] bg-primary-light/10 rounded-full blur-2xl top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse;
+}
+
+/* Gradient Text */
+.gradient-text {
+  @apply bg-gradient-to-r from-primary-light to-primary bg-clip-text text-transparent;
+}
+
+/* Gradient Button */
+.gradient-button {
+  @apply px-6 py-2 bg-gradient-to-r from-primary-light to-primary text-white rounded-full font-medium hover:shadow-lg transition-all transform hover:scale-105;
 }
 
 /* Scrollbar Styling */
@@ -25,14 +52,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #ffffff; /* Duolingo white */
+  background: theme('colors.background.dark');
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #89e219; /* Duolingo light green */
+  background: theme('colors.primary.light');
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #58cc02; /* Duolingo green */
+  background: theme('colors.primary.DEFAULT');
 }
