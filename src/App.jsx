@@ -11,9 +11,11 @@ import Challenges from './pages/Challenges';
 import Goals from './pages/Goals';
 import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
+
 import './App.css';
 import './styles/globals.css';
 import SignIn from './pages/signIn';
+import Level11 from './pages/Level1/round1';
 
 // Create a layout component for authenticated routes
 const AuthenticatedLayout = ({ children }) => {
@@ -51,6 +53,11 @@ function App() {
           <Route path="/" element={
             <PublicLayout>
               <Landing />
+            </PublicLayout>
+          } />
+          <Route path="/level11" element={
+            <PublicLayout>
+              <Level11 />
             </PublicLayout>
           } />
           <Route path="/signin" element={
