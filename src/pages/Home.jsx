@@ -27,30 +27,30 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#01110A] p-4 md:p-8 relative overflow-hidden">
-      {/* Animated background elements */}
+    <div className="min-h-screen p-4 md:p-8 relative overflow-hidden">
+      {/* Additional animated elements specific to Home page */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute w-72 h-72 bg-[#80A1C1] rounded-full -top-36 -left-36 opacity-20 animate-pulse"></div>
-        <div className="absolute w-96 h-96 bg-[#F4E87C] rounded-full -bottom-48 -right-48 opacity-10 animate-ping animate-delay-1000"></div>
-        <div className="absolute w-64 h-64 bg-[#80A1C1] rounded-full top-1/4 -right-32 opacity-15 animate-pulse animate-delay-2000"></div>
+        <div className="absolute w-72 h-72 bg-primary-light/30 rounded-full -top-36 -left-36 animate-pulse-slow"></div>
+        <div className="absolute w-96 h-96 bg-primary/20 rounded-full -bottom-48 -right-48 animate-pulse-slower animate-delay-1000"></div>
+        <div className="absolute w-64 h-64 bg-primary-light/25 rounded-full top-1/4 -right-32 animate-float animate-delay-2000"></div>
       </div>
 
       {/* Header with animation */}
       <div ref={headerRef} className="relative z-10 mb-8 transition-all duration-700 ease-out opacity-0 -translate-y-5">
-        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#F4E87C] to-[#80A1C1] bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-4xl font-bold heading-gradient">
           Welcome back, <span className="text-white">{user.name}!</span>
         </h1>
-        <p className="text-[#80A1C1] mt-2">Continue your financial literacy journey</p>
+        <p className="text-gray-300 mt-2">Continue your financial literacy journey</p>
         <div className="flex items-center mt-4">
-          <div className="h-1 w-12 bg-[#F4E87C] rounded-full mr-2"></div>
-          <div className="h-1 w-6 bg-[#80A1C1] rounded-full mr-2"></div>
-          <div className="h-1 w-3 bg-[#80A1C1] rounded-full"></div>
+          <div className="h-1 w-12 bg-gradient-to-r from-primary-light to-primary rounded-full mr-2"></div>
+          <div className="h-1 w-6 bg-primary-light/70 rounded-full mr-2"></div>
+          <div className="h-1 w-3 bg-primary-light/50 rounded-full"></div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative z-10">
-        <div className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-1">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 relative z-10">
+        <div className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-1 hover:shadow-xl">
           <StatsCard 
             title="Current Level" 
             value={user.level} 
@@ -59,7 +59,7 @@ const Home = () => {
             delay={0.1}
           />
         </div>
-        <div className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-1">
+        <div className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-1 hover:shadow-xl animate-delay-500">
           <StatsCard 
             title="FinCoins" 
             value={user.coins} 
@@ -68,12 +68,21 @@ const Home = () => {
             delay={0.2}
           />
         </div>
+        <div className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-1 hover:shadow-xl animate-delay-1000">
+          <StatsCard 
+            title="Streak" 
+            value={user.streak || 0} 
+            icon="🔥" 
+            color="#F4A87C" 
+            delay={0.3}
+          />
+        </div>
       </div>
 
       {/* Progress Section with 3D effect */}
-      <div className="relative z-10 mb-8 transform transition-all duration-500 hover:shadow-2xl">
+      <div className="relative z-10 mb-8 transform transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl">
         <div className="bg-[#0A1F14] rounded-2xl p-6 border border-[#1C3B2A] shadow-lg">
-          <h2 className="text-xl font-semibold text-[#F4E87C] mb-4">Your Progress</h2>
+          <h2 className="text-xl font-semibold heading-gradient mb-4">Your Progress</h2>
           <ProgressChart 
             xp={user.xp} 
             nextLevelXp={user.nextLevelXp} 
@@ -84,7 +93,7 @@ const Home = () => {
       {/* Featured Lessons */}
       <div className="relative z-10 mb-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-white relative inline-block">
+          <h2 className="text-2xl font-bold heading-gradient relative inline-block">
             Continue Learning
             <span className="absolute bottom-0 left-0 w-full h-1 bg-[#F4E87C] rounded-full"></span>
           </h2>
@@ -109,8 +118,8 @@ const Home = () => {
           {featuredLessons.map((lesson, index) => (
             <div 
               key={lesson.id} 
-              className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-2"
-              style={{ transitionDelay: `${index * 100}ms` }}
+              className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-2 hover:shadow-xl"
+              style={{ transitionDelay: `${index * 150}ms` }}
             >
               <LessonCard 
                 lesson={lesson} 
