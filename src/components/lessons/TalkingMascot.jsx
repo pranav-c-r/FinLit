@@ -32,9 +32,9 @@ const TalkingMascot = ({ voiceAudioSrc, mascotVideoSrc, dialogue, onComplete }) 
   };
 
   return (
-    <div className="flex flex-col items-center gap-5 pt-10">
+    <div className="flex flex-col items-center gap-5 pt-5">
       {/* Looping Mascot Video (silent) */}
-      <div className="relative w-32 h-32 rounded-full overflow-hidden shadow-lg border-4 border-accent-300">
+      <div className="relative w-32 h-32 rounded-full overflow-hidden shadow-lg border-4 border-[#58cc02] hover:border-[#2fa946] transition-all transform hover:scale-105">
         <video
           ref={videoRef}
           src={mascotVideoSrc}
@@ -45,13 +45,13 @@ const TalkingMascot = ({ voiceAudioSrc, mascotVideoSrc, dialogue, onComplete }) 
           className="w-full h-full object-cover"
         />
       </div>
-
+      
       {/* Hidden Audio Element for Voiceover */}
       <audio
         ref={audioRef}
         src={voiceAudioSrc}
         onEnded={handleAudioEnd}
-        preload="auto"
+        delay={1}
       />
 
       {/* Text display (optional - shows while audio plays) */}
