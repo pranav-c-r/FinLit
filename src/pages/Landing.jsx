@@ -12,7 +12,7 @@ const Landing = () => {
       </div>
         
         {/* Navigation */}
-  <nav className="flex justify-between items-center py-8 px-8 md:px-16 lg:px-32">
+  <nav className="flex justify-between items-center py-8 px-8">
           <div className="flex items-center">
             <div className="text-2xl font-bold bg-gradient-to-r from-[#58cc02] to-[#2fa946] bg-clip-text text-transparent">
               FinLit
@@ -67,7 +67,7 @@ const Landing = () => {
         </section>
 
         {/* Stats Section */}
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20 px-4 md:px-16 lg:px-32">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20 px-4">
           <div className="text-center p-8 bg-gradient-to-br from-[#1e293b] to-[#1a1f2e] rounded-xl border border-[#374151] shadow-lg">
             <div className="text-4xl font-bold text-[#58cc02] mb-2">10M+</div>
             <div className="text-gray-300 text-lg">Active Learners</div>
@@ -83,7 +83,7 @@ const Landing = () => {
         </div>
 
         {/* Features Section */}
-  <div className="mb-20 px-4 md:px-16 lg:px-32">
+  <div className="mb-20 px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Why FinLit Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="p-8 bg-gradient-to-br from-[#1e293b] to-[#1a1f2e] rounded-xl border border-[#374151] shadow-lg">
@@ -108,7 +108,7 @@ const Landing = () => {
         </div>
 
         {/* CTA Section */}
-  <div className="text-center px-4 md:px-16 lg:px-32">
+  <div className="text-center px-4">
           <h2 className="text-3xl font-bold mb-6">Ready to transform your financial future?</h2>
           <p className="text-xl text-gray-300 mb-10">
             Join millions who are taking control of their finances one lesson at a time.
@@ -122,7 +122,7 @@ const Landing = () => {
         </div>
 
         {/* Footer */}
-  <footer className="mt-20 pt-8 border-t border-[#374151] text-center text-gray-400 px-4 md:px-16 lg:px-32">
+  <footer className="mt-20 pt-8 border-t border-[#374151] text-center text-gray-400 px-4">
           <p>© {new Date().getFullYear()} FinLit. All rights reserved.</p>
         </footer>
   </div>

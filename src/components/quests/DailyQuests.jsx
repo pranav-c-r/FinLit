@@ -5,10 +5,10 @@ import { motion } from 'framer-motion';
 const DailyQuests = () => {
   const { state, dispatch } = useApp();
   const [activeTab, setActiveTab] = useState('daily');
-  
+
   // Initialize daily quests if they don't exist
   useEffect(() => {
-    if (!state.dailyQuests) {
+    if (!state.dailyQuests || !Array.isArray(state.dailyQuests.quests)) {
       // Generate sample quests
       const sampleQuests = [
         {
@@ -66,7 +66,7 @@ const DailyQuests = () => {
           dateGenerated: new Date().toISOString()
         }
       ];
-      
+
       dispatch({
         type: 'INIT_DAILY_QUESTS',
         payload: {
@@ -89,24 +89,24 @@ const DailyQuests = () => {
     });
   };
 
-  // Filter quests based on active tab
-  const filteredQuests = state.dailyQuests?.quests.filter(quest => {
+  // If quests are not initialized yet, show loading
+  if (!state.dailyQuests || !Array.isArray(state.dailyQuests.quests)) {
+    return <div className="text-center py-8">Loading quests...</div>;
+  }
+
+  // Filter quests based on active tab safely
+  const filteredQuests = (state.dailyQuests.quests || []).filter((quest) => {
     if (activeTab === 'completed') return quest.completed;
     if (activeTab === 'daily') return quest.type === 'daily' && !quest.completed;
     if (activeTab === 'weekly') return quest.type === 'weekly' && !quest.completed;
     return true;
-  }) || [];
-
-  // If quests are not initialized yet, show loading
-  if (!state.dailyQuests) {
-    return <div className="text-center py-8">Loading quests...</div>;
-  }
+  });
 
   return (
     <div className="game-panel p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold gradient-text-secondary">Your Quests</h2>
-        
+
         <div className="flex items-center space-x-2">
           <div className="text-sm text-gray-300">Streak:</div>
           <div className="flex items-center bg-gray-800 rounded-full px-3 py-1">
@@ -115,29 +115,41 @@ const DailyQuests = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Tabs */}
       <div className="flex border-b border-gray-700 mb-6">
         <button
-          className={`px-4 py-2 font-medium ${activeTab === 'daily' ? 'text-primary-light border-b-2 border-primary-light' : 'text-gray-400 hover:text-gray-300'}`}
+          className={`px-4 py-2 font-medium ${
+            activeTab === 'daily'
+              ? 'text-primary-light border-b-2 border-primary-light'
+              : 'text-gray-400 hover:text-gray-300'
+          }`}
           onClick={() => setActiveTab('daily')}
         >
           Daily
         </button>
         <button
-          className={`px-4 py-2 font-medium ${activeTab === 'weekly' ? 'text-primary-light border-b-2 border-primary-light' : 'text-gray-400 hover:text-gray-300'}`}
+          className={`px-4 py-2 font-medium ${
+            activeTab === 'weekly'
+              ? 'text-primary-light border-b-2 border-primary-light'
+              : 'text-gray-400 hover:text-gray-300'
+          }`}
           onClick={() => setActiveTab('weekly')}
         >
           Weekly
         </button>
         <button
-          className={`px-4 py-2 font-medium ${activeTab === 'completed' ? 'text-primary-light border-b-2 border-primary-light' : 'text-gray-400 hover:text-gray-300'}`}
+          className={`px-4 py-2 font-medium ${
+            activeTab === 'completed'
+              ? 'text-primary-light border-b-2 border-primary-light'
+              : 'text-gray-400 hover:text-gray-300'
+          }`}
           onClick={() => setActiveTab('completed')}
         >
           Completed
         </button>
       </div>
-      
+
       {/* Quest List */}
       <div className="space-y-4">
         {filteredQuests.length === 0 ? (
@@ -146,7 +158,7 @@ const DailyQuests = () => {
           </div>
         ) : (
           filteredQuests.map((quest) => (
-            <motion.div 
+            <motion.div
               key={quest.id}
               className="game-card p-4"
               initial={{ opacity: 0, y: 20 }}
@@ -157,7 +169,7 @@ const DailyQuests = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-1">{quest.title}</h3>
                   <p className="text-gray-300 text-sm mb-3">{quest.description}</p>
-                  
+
                   <div className="flex space-x-3 text-sm">
                     <div className="flex items-center text-yellow-500">
                       <span className="mr-1">⭐</span>
@@ -169,7 +181,7 @@ const DailyQuests = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {!quest.completed ? (
                   <button
                     onClick={() => handleCompleteQuest(quest.id)}
@@ -187,7 +199,7 @@ const DailyQuests = () => {
           ))
         )}
       </div>
-      
+
       {/* Quest Refresh Timer */}
       <div className="mt-6 text-center text-sm text-gray-400">
         <p>New quests will be available tomorrow</p>

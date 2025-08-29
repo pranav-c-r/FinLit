@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
@@ -13,8 +13,8 @@ import Goals from './pages/Goals';
 import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
 import PiggyBank from './pages/PiggyBank';
-import DailyQuests from './pages/DailyQuests';
-import ExpenseTracker from './pages/ExpenseTracker';
+import ExpenseTracker from './components/expenses/ExpenseTracker';
+import DailyQuests from './components/quests/DailyQuests';
 import Rewards from './pages/Rewards';
 import Social from './pages/Social';
 import Achievements from './pages/Achievements';
@@ -61,7 +61,7 @@ const PublicLayout = ({ children, path }) => {
           {children}
         </main>
         {/* Don't include Footer on Landing page as it has its own footer */}
-        {path !== '/' && <Footer />}
+        {path !== '/landing' && <Footer />}
       </div>
     </div>
   );
@@ -72,9 +72,12 @@ function App() {
     <AppProvider>
       <Router>
         <Routes>
-          {/* Public routes without sidebar/navigation */}
+          {/* Redirect from root to home */}
           <Route path="/" element={
-            <PublicLayout path="/">
+            <Navigate to="/home" replace />
+          } />
+          <Route path="/landing" element={
+            <PublicLayout path="/landing">
               <Landing />
             </PublicLayout>
           } />
@@ -120,7 +123,7 @@ function App() {
               <Profile />
             </AuthenticatedLayout>
           } />
-          <Route path="/piggybank" element={
+          <Route path="/piggy-bank" element={
             <AuthenticatedLayout>
               <PiggyBank />
             </AuthenticatedLayout>
@@ -130,7 +133,7 @@ function App() {
               <DailyQuests />
             </AuthenticatedLayout>
           } />
-          <Route path="/expenses" element={
+          <Route path="/expense-tracker" element={
             <AuthenticatedLayout>
               <ExpenseTracker />
             </AuthenticatedLayout>

@@ -34,10 +34,10 @@ const ExpenseTracker = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // Initialize expenses if they don't exist
+
+  // Initialize expenses safely
   useEffect(() => {
-    if (!state.expenses) {
+    if (!state?.expenses) {
       dispatch({
         type: 'INIT_EXPENSES',
         payload: {
@@ -49,15 +49,17 @@ const ExpenseTracker = () => {
         }
       });
     }
-  }, [state.expenses, dispatch]);
+  }, [state?.expenses, dispatch]);
+
+  // If expenses aren't ready, show loading
+  if (!state?.expenses) {
+    return <div className="text-center py-8">Loading expense tracker...</div>;
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (!amount || isNaN(amount) || parseFloat(amount) <= 0 || !category) {
-      return;
-    }
-    
+    if (!amount || isNaN(amount) || parseFloat(amount) <= 0 || !category) return;
+
     const transaction = {
       id: editingId || `txn-${Date.now()}`,
       type: transactionType,
@@ -65,27 +67,17 @@ const ExpenseTracker = () => {
       category,
       description,
       date,
-      createdAt: editingId ? state.expenses.transactions.find(t => t.id === editingId).createdAt : new Date().toISOString()
+      createdAt: editingId
+        ? state.expenses.transactions.find(t => t.id === editingId)?.createdAt
+        : new Date().toISOString()
     };
-    
-    if (editingId) {
-      dispatch({
-        type: 'UPDATE_EXPENSE',
-        payload: transaction
-      });
-      setEditingId(null);
-    } else {
-      dispatch({
-        type: 'ADD_EXPENSE',
-        payload: transaction
-      });
-    }
-    
-    // Reset form
-    setAmount('');
-    setCategory('');
-    setDescription('');
-    setDate(new Date().toISOString().split('T')[0]);
+
+    dispatch({
+      type: editingId ? 'UPDATE_EXPENSE' : 'ADD_EXPENSE',
+      payload: transaction
+    });
+
+    resetForm();
   };
 
   const handleEdit = (transaction) => {
@@ -103,10 +95,7 @@ const ExpenseTracker = () => {
   };
 
   const confirmDelete = () => {
-    dispatch({
-      type: 'DELETE_EXPENSE',
-      payload: { id: deleteId }
-    });
+    dispatch({ type: 'DELETE_EXPENSE', payload: { id: deleteId } });
     setShowDeleteConfirm(false);
     setDeleteId(null);
   };
@@ -125,241 +114,304 @@ const ExpenseTracker = () => {
     setDate(new Date().toISOString().split('T')[0]);
   };
 
-  // Get categories based on transaction type
   const categories = transactionType === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
-  
-  // Filter and sort transactions
-  const filteredTransactions = state.expenses?.transactions
+
+  const filteredTransactions = (state.expenses.transactions || [])
     .filter(transaction => {
-      // Filter by type
       if (filter !== 'all' && transaction.type !== filter) return false;
-      
-      // Filter by search term
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase();
         return (
-          transaction.description.toLowerCase().includes(searchLower) ||
-          transaction.category.toLowerCase().includes(searchLower)
+          transaction.description?.toLowerCase().includes(searchLower) ||
+          transaction.category?.toLowerCase().includes(searchLower)
         );
       }
-      
       return true;
     })
-    .sort((a, b) => new Date(b.date) - new Date(a.date)) || [];
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  // Get category details by ID
   const getCategoryDetails = (type, categoryId) => {
     const categoryList = type === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
     return categoryList.find(cat => cat.id === categoryId) || { label: 'Unknown', icon: '❓', color: 'text-gray-500' };
   };
 
-  // If expenses are not initialized yet, show loading
-  if (!state.expenses) {
-    return <div className="text-center py-8">Loading expense tracker...</div>;
-  }
+  // Calculate totals
+  const totalExpenses = filteredTransactions
+    .filter(t => t.type === 'expense')
+    .reduce((sum, t) => sum + t.amount, 0);
+    
+  const totalIncome = filteredTransactions
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => sum + t.amount, 0);
+    
+  const balance = totalIncome - totalExpenses;
 
   return (
     <div className="game-panel p-6">
       <h2 className="text-2xl font-bold gradient-text-secondary mb-6">
         {editingId ? 'Edit Transaction' : 'Add New Transaction'}
       </h2>
-      
-      {/* Transaction Form */}
+
+      {/* Form Section */}
       <form onSubmit={handleSubmit} className="mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          {/* Transaction Type */}
           <div>
-            <label className="block text-gray-300 mb-2">Transaction Type</label>
-            <div className="flex rounded-lg overflow-hidden">
+            <label className="block text-sm font-medium text-gray-300 mb-1">Transaction Type</label>
+            <div className="flex rounded-lg bg-gray-800 p-1">
               <button
                 type="button"
-                className={`flex-1 py-2 ${transactionType === 'expense' ? 'gradient-button-tertiary' : 'bg-gray-800 text-gray-300'}`}
                 onClick={() => setTransactionType('expense')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  transactionType === 'expense'
+                    ? 'bg-red-600 text-white'
+                    : 'text-gray-400 hover:text-gray-300'
+                }`}
               >
                 Expense
               </button>
               <button
                 type="button"
-                className={`flex-1 py-2 ${transactionType === 'income' ? 'gradient-button-primary' : 'bg-gray-800 text-gray-300'}`}
                 onClick={() => setTransactionType('income')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  transactionType === 'income'
+                    ? 'bg-green-600 text-white'
+                    : 'text-gray-400 hover:text-gray-300'
+                }`}
               >
                 Income
               </button>
             </div>
           </div>
-          
-          {/* Amount */}
+
           <div>
-            <label htmlFor="amount" className="block text-gray-300 mb-2">Amount</label>
+            <label htmlFor="amount" className="block text-sm font-medium text-gray-300 mb-1">
+              Amount
+            </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">$</span>
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span className="text-gray-400">$</span>
+              </div>
               <input
                 type="number"
                 id="amount"
+                step="0.01"
+                min="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
+                className="pl-8 w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-primary-light"
                 placeholder="0.00"
-                className="w-full pl-8 pr-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                min="0.01"
-                step="0.01"
-                required
               />
             </div>
           </div>
         </div>
-        
-        {/* Category */}
-        <div className="mb-4">
-          <label className="block text-gray-300 mb-2">Category</label>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                className={`p-2 rounded-lg flex flex-col items-center justify-center transition-all ${category === cat.id ? 'game-card' : 'bg-gray-800 hover:bg-gray-700'}`}
-                onClick={() => setCategory(cat.id)}
-              >
-                <span className="text-2xl mb-1">{cat.icon}</span>
-                <span className={`text-xs ${cat.color}`}>{cat.label}</span>
-              </button>
-            ))}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label htmlFor="category" className="block text-sm font-medium text-gray-300 mb-1">
+              Category
+            </label>
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-primary-light"
+            >
+              <option value="">Select a category</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.icon} {cat.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium text-gray-300 mb-1">
+              Date
+            </label>
+            <input
+              type="date"
+              id="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-primary-light"
+            />
           </div>
         </div>
-        
-        {/* Description */}
+
         <div className="mb-4">
-          <label htmlFor="description" className="block text-gray-300 mb-2">Description</label>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-1">
+            Description
+          </label>
           <input
             type="text"
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="What was this for?"
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-primary-light"
+            placeholder="Enter a description"
           />
         </div>
-        
-        {/* Date */}
-        <div className="mb-6">
-          <label htmlFor="date" className="block text-gray-300 mb-2">Date</label>
-          <input
-            type="date"
-            id="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            required
-          />
-        </div>
-        
-        {/* Form Actions */}
+
         <div className="flex space-x-3">
           <button
             type="submit"
-            className={`flex-1 py-2 rounded-lg font-medium ${transactionType === 'expense' ? 'gradient-button-tertiary' : 'gradient-button-primary'}`}
+            className="gradient-button-primary flex-1 py-2 px-4 rounded-lg font-medium"
           >
-            {editingId ? 'Update' : 'Add'} {transactionType === 'expense' ? 'Expense' : 'Income'}
+            {editingId ? 'Update Transaction' : 'Add Transaction'}
           </button>
-          
           {editingId && (
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium text-white transition"
+              className="bg-gray-700 hover:bg-gray-600 py-2 px-4 rounded-lg font-medium text-white transition"
             >
               Cancel
             </button>
           )}
         </div>
       </form>
-      
-      {/* Transaction List */}
-      <div>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-white">Recent Transactions</h3>
-          
-          <div className="flex space-x-2">
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="px-2 py-1 bg-gray-800 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="all">All</option>
-              <option value="expense">Expenses</option>
-              <option value="income">Income</option>
-            </select>
-            
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search..."
-              className="px-2 py-1 bg-gray-800 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="game-card p-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-gray-300">Income</h3>
+            <span className="text-green-500">💰</span>
           </div>
+          <p className="text-2xl font-bold text-green-500">${totalIncome.toFixed(2)}</p>
         </div>
+        
+        <div className="game-card p-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-gray-300">Expenses</h3>
+            <span className="text-red-500">💸</span>
+          </div>
+          <p className="text-2xl font-bold text-red-500">${totalExpenses.toFixed(2)}</p>
+        </div>
+        
+        <div className="game-card p-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-gray-300">Balance</h3>
+            <span className={balance >= 0 ? 'text-green-500' : 'text-red-500'}>
+              {balance >= 0 ? '📈' : '📉'}
+            </span>
+          </div>
+          <p className={`text-2xl font-bold ${balance >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            ${Math.abs(balance).toFixed(2)}
+          </p>
+        </div>
+      </div>
+
+      {/* Filters and Search */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setFilter('all')}
+            className={`px-3 py-1 rounded-lg text-sm font-medium ${
+              filter === 'all'
+                ? 'bg-primary-light text-white'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter('income')}
+            className={`px-3 py-1 rounded-lg text-sm font-medium ${
+              filter === 'income'
+                ? 'bg-green-700 text-white'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            Income
+          </button>
+          <button
+            onClick={() => setFilter('expense')}
+            className={`px-3 py-1 rounded-lg text-sm font-medium ${
+              filter === 'expense'
+                ? 'bg-red-700 text-white'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            Expenses
+          </button>
+        </div>
+        
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span className="text-gray-400">🔍</span>
+          </div>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 w-full md:w-64 bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-primary-light"
+            placeholder="Search transactions..."
+          />
+        </div>
+      </div>
+
+      {/* Transactions List */}
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold text-white mb-3">Recent Transactions</h3>
         
         {filteredTransactions.length === 0 ? (
           <div className="text-center py-8 text-gray-400">
-            No transactions found. Add your first one!
+            {searchTerm ? 'No transactions match your search.' : 'No transactions yet.'}
           </div>
         ) : (
-          <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-            {filteredTransactions.map((transaction) => {
-              const categoryDetails = getCategoryDetails(transaction.type, transaction.category);
-              
-              return (
-                <motion.div 
-                  key={transaction.id}
-                  className="game-card p-3"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${transaction.type === 'expense' ? 'bg-tertiary bg-opacity-20' : 'bg-primary bg-opacity-20'} mr-3`}>
-                        <span className="text-xl">{categoryDetails.icon}</span>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium text-white">{transaction.description || categoryDetails.label}</h4>
-                        <div className="flex space-x-3 text-xs text-gray-400">
-                          <span>{new Date(transaction.date).toLocaleDateString()}</span>
-                          <span className={categoryDetails.color}>{categoryDetails.label}</span>
-                        </div>
-                      </div>
+          filteredTransactions.map((transaction) => {
+            const categoryDetails = getCategoryDetails(transaction.type, transaction.category);
+            return (
+              <motion.div
+                key={transaction.id}
+                className="game-card p-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <div className={`text-xl ${categoryDetails.color}`}>
+                      {categoryDetails.icon}
                     </div>
-                    
-                    <div className="flex flex-col items-end">
-                      <span className={`font-bold ${transaction.type === 'expense' ? 'text-tertiary-light' : 'text-primary-light'}`}>
-                        {transaction.type === 'expense' ? '-' : '+'} ${transaction.amount.toFixed(2)}
-                      </span>
-                      
-                      <div className="flex space-x-1 mt-1">
-                        <button
-                          onClick={() => handleEdit(transaction)}
-                          className="text-xs text-gray-400 hover:text-white transition"
-                        >
-                          Edit
-                        </button>
-                        <span className="text-gray-600">|</span>
-                        <button
-                          onClick={() => handleDelete(transaction.id)}
-                          className="text-xs text-gray-400 hover:text-red-400 transition"
-                        >
-                          Delete
-                        </button>
+                    <div>
+                      <h4 className="font-medium text-white">{transaction.description || 'No description'}</h4>
+                      <div className="flex items-center text-sm text-gray-400 mt-1">
+                        <span>{categoryDetails.label}</span>
+                        <span className="mx-2">•</span>
+                        <span>{new Date(transaction.date).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              );
-            })}
-          </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <span className={`font-semibold ${transaction.type === 'income' ? 'text-green-500' : 'text-red-500'}`}>
+                      {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
+                    </span>
+                    <div className="flex space-x-1">
+                      <button
+                        onClick={() => handleEdit(transaction)}
+                        className="p-1 text-blue-400 hover:text-blue-300 transition"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => handleDelete(transaction.id)}
+                        className="p-1 text-red-400 hover:text-red-300 transition"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })
         )}
       </div>
-      
+
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -369,16 +421,10 @@ const ExpenseTracker = () => {
               Are you sure you want to delete this transaction? This action cannot be undone.
             </p>
             <div className="flex space-x-4">
-              <button 
-                onClick={cancelDelete}
-                className="flex-1 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg font-medium text-white transition"
-              >
+              <button onClick={cancelDelete} className="flex-1 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg font-medium text-white transition">
                 Cancel
               </button>
-              <button 
-                onClick={confirmDelete}
-                className="flex-1 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-medium text-white transition"
-              >
+              <button onClick={confirmDelete} className="flex-1 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-medium text-white transition">
                 Delete
               </button>
             </div>
