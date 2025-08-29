@@ -7,6 +7,8 @@
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+  background-size: 100% 100%;
+  background-attachment: fixed;
 }
 
 .app-content {
@@ -15,6 +17,7 @@
   flex-direction: column;
   position: relative;
   z-index: 1;
+  min-height: 100vh;
 }
 
 .main-content {
@@ -22,16 +25,19 @@
   margin: 0 auto;
   width: 100%;
   position: relative;
-  padding-bottom: 2rem;
+  padding-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Background animation elements for all pages */
+/* Game UI Background */
 .app-background {
   position: absolute;
   inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  background-image: linear-gradient(to bottom right, rgba(0, 161, 255, 0.03), rgba(110, 255, 0, 0.03));
 }
 
 /* Animated transitions */
@@ -53,6 +59,15 @@
 .page-transition-exit-active {
   opacity: 0;
   transition: opacity 300ms;
+}
+
+/* Public layout styling */
+.public-layout {
+  min-height: calc(100vh - 120px); /* Adjust based on footer height */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
 }
 
 /* Mobile layout (base - mobile first) */

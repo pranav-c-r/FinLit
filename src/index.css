@@ -23,17 +23,17 @@ body {
   position: relative;
 }
 
-/* Animated Background Element Classes */
-.bg-blob-1 {
-  @apply absolute w-[600px] h-[600px] bg-primary-light/20 rounded-full blur-3xl -top-40 -left-40 animate-pulse-slow;
+/* Game UI Elements */
+.game-card {
+  @apply bg-background-dark/80 backdrop-blur-md border border-accent/50 rounded-xl shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 hover:border-primary/50;
 }
 
-.bg-blob-2 {
-  @apply absolute w-[400px] h-[400px] bg-primary/20 rounded-full blur-2xl -bottom-32 -right-32 animate-pulse-slower;
+.game-panel {
+  @apply bg-background-dark/80 backdrop-blur-md border border-accent/50 rounded-xl shadow-lg;
 }
 
-.bg-blob-3 {
-  @apply absolute w-[200px] h-[200px] bg-primary-light/10 rounded-full blur-2xl top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse;
+.game-button {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-md;
 }
 
 /* Gradient Text */
@@ -41,9 +41,25 @@ body {
   @apply bg-gradient-to-r from-primary-light to-primary bg-clip-text text-transparent;
 }
 
-/* Gradient Button */
-.gradient-button {
-  @apply px-6 py-2 bg-gradient-to-r from-primary-light to-primary text-white rounded-full font-medium hover:shadow-lg transition-all transform hover:scale-105;
+.gradient-text-secondary {
+  @apply bg-gradient-to-r from-secondary-light to-secondary bg-clip-text text-transparent;
+}
+
+.gradient-text-tertiary {
+  @apply bg-gradient-to-r from-tertiary-light to-tertiary bg-clip-text text-transparent;
+}
+
+/* Gradient Buttons */
+.gradient-button-primary {
+  @apply px-6 py-2 bg-gradient-to-r from-primary-light to-primary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-primary/50 transition-all transform hover:scale-105;
+}
+
+.gradient-button-secondary {
+  @apply px-6 py-2 bg-gradient-to-r from-secondary-light to-secondary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-secondary/50 transition-all transform hover:scale-105;
+}
+
+.gradient-button-tertiary {
+  @apply px-6 py-2 bg-gradient-to-r from-tertiary-light to-tertiary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-tertiary/50 transition-all transform hover:scale-105;
 }
 
 /* Scrollbar Styling */
