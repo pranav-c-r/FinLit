@@ -19,15 +19,15 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="bg-[#01110A] p-4 border-b border-[#1C3B2A] sticky top-0 z-50 shadow-lg">
+    <header className="bg-background-DEFAULT p-4 border-b border-accent sticky top-0 z-50 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo with animation */}
         <div className="flex items-center">
-          <div className="text-[#F4E87C] text-2xl font-bold relative">
-            <span className="bg-gradient-to-r from-[#80A1C1] to-[#F4E87C] bg-clip-text text-transparent">
+          <div className="text-2xl font-bold relative">
+            <span className="gradient-text">
               FinLit
             </span>
-            <div className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-[#80A1C1] to-[#F4E87C] rounded-full"></div>
+            <div className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-primary-light to-primary rounded-full"></div>
           </div>
         </div>
         
@@ -36,7 +36,7 @@ const Header = () => {
           {/* Notification bell with animation */}
           <div className="relative">
             <button 
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-[#0A1F14] text-[#80A1C1] hover:text-[#F4E87C] transition-all duration-300 hover:scale-110"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-background-light text-white hover:text-primary-light transition-all duration-300 hover:scale-110"
               onClick={() => setShowNotification(!showNotification)}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -46,17 +46,17 @@ const Header = () => {
             
             {/* Notification indicator */}
             {showNotification && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#F4E87C] rounded-full animate-ping"></div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary-light rounded-full animate-ping"></div>
             )}
             
             {/* Notification dropdown */}
             {showNotification && (
-              <div className="absolute right-0 top-12 w-72 bg-[#0A1F14] rounded-xl shadow-xl border border-[#1C3B2A] p-4 animate-fade-in">
+              <div className="absolute right-0 top-12 w-72 bg-background-light rounded-xl shadow-xl border border-accent p-4 animate-fade-in">
                 <div className="flex items-center mb-2">
-                  <div className="w-3 h-3 bg-[#F4E87C] rounded-full mr-2"></div>
-                  <h3 className="text-[#F4E87C] font-semibold">New Achievement!</h3>
+                  <div className="w-3 h-3 bg-primary-light rounded-full mr-2"></div>
+                  <h3 className="gradient-text font-semibold">New Achievement!</h3>
                 </div>
-                <p className="text-[#80A1C1] text-sm">You've earned 50 XP for completing your daily goal!</p>
+                <p className="text-gray-300 text-sm">You've earned 50 XP for completing your daily goal!</p>
               </div>
             )}
           </div>

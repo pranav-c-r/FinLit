@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 * {
   margin: 0;
@@ -8,7 +8,7 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #01110A;
+  background-color: theme('colors.background.DEFAULT');
   color: #FFFFFF;
   line-height: 1.6;
 }
@@ -19,6 +19,7 @@ body {
   padding: 0;
 }
 
+/* Utility Classes */
 .flex {
   display: flex;
 }
@@ -49,6 +50,50 @@ body {
 
 .grid-4 {
   grid-template-columns: repeat(4, 1fr);
+}
+
+/* Card Styles */
+.card {
+  @apply bg-gradient-to-br from-background-light to-background rounded-xl border border-accent shadow-lg p-6 transition-all duration-300 hover:shadow-xl;
+}
+
+/* Button Styles */
+.btn {
+  @apply px-6 py-2 rounded-full font-medium transition-all duration-300;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-primary-light to-primary text-white hover:shadow-lg transform hover:scale-105;
+}
+
+.btn-secondary {
+  @apply border-2 border-primary-light text-primary-light hover:bg-primary-light hover:bg-opacity-10 transform hover:scale-105;
+}
+
+/* Text Styles */
+.heading-gradient {
+  @apply bg-gradient-to-r from-primary-light to-primary bg-clip-text text-transparent font-bold;
+}
+
+/* Animation Classes */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-delay-500 {
+  animation-delay: 500ms;
+}
+
+.animate-delay-1000 {
+  animation-delay: 1000ms;
+}
+
+.animate-delay-1500 {
+  animation-delay: 1500ms;
+}
+
+.animate-delay-2000 {
+  animation-delay: 2000ms;
 }
 
 .gap-1 {
