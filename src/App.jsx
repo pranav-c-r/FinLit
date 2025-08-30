@@ -52,12 +52,13 @@ const AuthenticatedLayout = ({ children }) => {
 };
 
 // Create a layout for public routes (no sidebar/navigation)
+// Create a layout for public routes (no sidebar/navigation)
 const PublicLayout = ({ children, path }) => {
   return (
-    <div className="App">
+    <div className="App public-layout-container"> {/* Added public-layout-container class */}
       <GameBackground />
       <div className="app-content">
-        <main className="main-content public-layout">
+        <main className="main-content public-layout landing-page"> {/* Added landing-page class */}
           {children}
         </main>
         {/* Don't include Footer on Landing page as it has its own footer */}
@@ -72,9 +73,9 @@ function App() {
     <AppProvider>
       <Router>
         <Routes>
-          {/* Redirect from root to home */}
+          {/* Redirect from root to landing page */}
           <Route path="/" element={
-            <Navigate to="/home" replace />
+            <Navigate to="/landing" replace />
           } />
           <Route path="/landing" element={
             <PublicLayout path="/landing">

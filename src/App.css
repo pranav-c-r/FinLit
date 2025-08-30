@@ -18,6 +18,7 @@
   position: relative;
   z-index: 1;
   min-height: 100vh;
+  margin-left: 0; /* Default to 0 for public layout */
 }
 
 .main-content {
@@ -61,37 +62,62 @@
   transition: opacity 300ms;
 }
 
-/* Public layout styling */
+/* Public layout styling - override margin for public pages */
 .public-layout {
-  min-height: calc(100vh - 120px); /* Adjust based on footer height */
+  min-height: calc(100vh - 120px);
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem;
+  max-width: 100%; /* Changed from 1200px to 100% */
+  margin: 0;
+  padding: 0; /* Remove padding */
+}
+
+/* Specific styling for landing page */
+.landing-page {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* Mobile layout (base - mobile first) */
 @media (max-width: 768px) {
   .App {
-    display: flex; /* Keep flex instead of block */
+    display: flex;
     flex-direction: column;
   }
   
   .app-content {
     margin-left: 0;
   }
+  
+  /* Ensure public layout has no margin on mobile */
+  .public-layout {
+    margin-left: 0;
+  }
 }
 
 /* Tablet layout */
 @media (min-width: 769px) and (max-width: 1024px) {
-  .app-content {
+  /* Only apply margin for authenticated layout */
+  .app-content:not(.public-layout-container) {
     margin-left: 280px;
+  }
+  
+  /* Public layout should have no margin */
+  .public-layout-container .app-content {
+    margin-left: 0;
   }
 }
 
 /* Desktop layout */
 @media (min-width: 1025px) {
-  .app-content {
+  /* Only apply margin for authenticated layout */
+  .app-content:not(.public-layout-container) {
     margin-left: 280px;
+  }
+  
+  /* Public layout should have no margin */
+  .public-layout-container .app-content {
+    margin-left: 0;
   }
 }
