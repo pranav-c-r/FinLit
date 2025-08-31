@@ -6,6 +6,7 @@ const Sidebar = () => {
 
   const navItems = [
     { path: '/home', icon: '🏠', label: 'Home' },
+    { path: '/levels', icon: '🗺️', label: 'Story Mode' },
     { path: '/lessons', icon: '📚', label: 'Lessons' },
     { path: '/challenges', icon: '🎯', label: 'Challenges' },
     { path: '/goals', icon: '🚩', label: 'Goals' },
