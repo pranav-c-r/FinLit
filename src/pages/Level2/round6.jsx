@@ -5,6 +5,8 @@ import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import RoundIntroModal from '../../components/lessons/RoundIntroModal';
 import GuideScreen from '../../components/lessons/GuideScreen';
 import MascotDialogue from '../../components/lessons/MascotDialogue';
+import { useNavigate } from 'react-router-dom';
+import { saveUserProgress as saveProgress } from '../../utils/firebaseUtils';
 
 const Round6 = () => {
   const [showIntro, setShowIntro] = useState(true);
@@ -26,6 +28,7 @@ const Round6 = () => {
   });
 
   const speechSynthesisRef = useRef(window.speechSynthesis);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadVoices = () => {
@@ -167,19 +170,15 @@ const Round6 = () => {
   useEffect(() => {
     if (mascotDialogues.length > 0 && currentDialogueIndex < mascotDialogues.length) {
       playCurrentDialogue();
+    } else if (showSummary) {
+      saveUserProgress();
     }
-  }, [currentDialogueIndex, mascotDialogues]);
+  }, [currentDialogueIndex, mascotDialogues, showSummary]);
 
   const saveUserProgress = async () => {
     if (!auth.currentUser) return;
     try {
-      const userProgressRef = doc(database, "Users", auth.currentUser.uid);
-      const docSnap = await getDoc(userProgressRef);
-      if (docSnap.exists()) {
-        await updateDoc(userProgressRef, { "level2.round6": userChoices, "round6_completed": true });
-      } else {
-        await setDoc(userProgressRef, { "level2": { "round6": userChoices }, "round6_completed": true });
-      }
+      await saveProgress(2, 6, userChoices);
       console.log("Level 2 Round 6 Progress saved successfully");
     } catch (error) {
       console.error("Error saving progress:", error);
@@ -520,7 +519,7 @@ const Round6 = () => {
                       onClick={() => {
                         saveUserProgress();
                         // For now, redirect to Level 2 overview after completing Round 6
-                        window.location.href = '/level2';
+                        navigate('/levels');
                       }}
                     >
                       <span>Continue to Level 2 Overview</span>

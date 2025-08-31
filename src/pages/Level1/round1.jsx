@@ -10,6 +10,8 @@ import ParentDialogue from '../../components/lessons/ParentDialogue';
 import ExpenseAllocation from '../../components/lessons/ExpenseAllocation';
 import level11Audio from '../../assets/level11.mp3';
 import oldManVideoSrc from '../../assets/oldman.mp4';
+import { useNavigate } from 'react-router-dom';
+import { saveUserProgress as saveProgress } from '../../utils/firebaseUtils';
 
 const Round1 = () => {
   const [showIntro, setShowIntro] = useState(true);
@@ -17,6 +19,7 @@ const Round1 = () => {
   const [showJobOptions, setShowJobOptions] = useState(false);
   const [showSalaryOptions, setShowSalaryOptions] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [mascotDialogues, setMascotDialogues] = useState([]);
   const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -32,6 +35,7 @@ const Round1 = () => {
   
   // Refs for speech synthesis
   const speechSynthesisRef = useRef(window.speechSynthesis);
+  const navigate = useNavigate();
 
   // Initialize voices on component mount
   useEffect(() => {
@@ -232,22 +236,39 @@ const Round1 = () => {
       setCurrentDialogueIndex(prev => prev + 1);
     } else {
       console.log('All dialogues completed');
-      // After job description, show salary options
-      if (userChoices.job && selectedJobType !== 'government') { // Only show salary options if a job with income was chosen
-        setMascotDialogues([
-          { text: "You receive your first salary / stipend. What will you do with it?", audioSrc: null }
-        ]);
-        setCurrentDialogueIndex(0);
-        setShowSalaryOptions(true);
-      } else if (selectedJobType === 'government') {
-        // If government exams, directly go to summary for now, or add specific dialogue
-        setMascotDialogues([
-          { text: "No income for now, but if you succeed, you’ll have a secure job for life. Let's see your progress.", audioSrc: null }
-        ]);
-        setCurrentDialogueIndex(0);
+      
+      if (showJobOptions) {
+        // Reset transition state after dialogue completes
+        setIsTransitioning(false);
+        
+        // After job description dialogue, transition to salary options if not government job
+        if (userChoices.job && selectedJobType !== 'government') {
+          setMascotDialogues([
+            { text: "You receive your first salary / stipend. What will you do with it?", audioSrc: null }
+          ]);
+          setCurrentDialogueIndex(0);
+          setShowJobOptions(false); // Hide job options
+          setShowSalaryOptions(true); // Show salary options
+        } else if (selectedJobType === 'government') {
+          // If government exams, directly go to summary - but allow for longer dialogue
+          setMascotDialogues([
+            { text: "No income for now, but if you succeed, you'll have a secure job for life.", audioSrc: null },
+            { text: "Let's see your progress so far and prepare for the next challenge!", audioSrc: null }
+          ]);
+          setCurrentDialogueIndex(0);
+          setShowJobOptions(false); // Hide job options
+          setShowSummary(true); // Show summary
+        } else {
+          // Fallback for unexpected state after job selection, go to summary
+          setShowJobOptions(false);
+          setShowSummary(true);
+        }
+      } else if (showSalaryOptions) {
+        // After salary choice dialogues, show summary
+        setShowSalaryOptions(false);
         setShowSummary(true);
       } else {
-        // Fallback for unexpected state, go to summary
+        // Fallback for unexpected state, directly go to summary
         setShowSummary(true);
       }
     }
@@ -257,49 +278,15 @@ const Round1 = () => {
   useEffect(() => {
     if (mascotDialogues.length > 0 && currentDialogueIndex < mascotDialogues.length) {
       playCurrentDialogue();
+    } else if (showSummary) {
+      // When all dialogues are done and summary is shown, save progress
+      saveUserProgress();
     }
-  }, [currentDialogueIndex, mascotDialogues]);
+  }, [currentDialogueIndex, mascotDialogues, showSummary]);
 
-  // Save user progress to Firebase
+  // Save user progress to Firebase using centralized utility
   const saveUserProgress = async () => {
-    if (!auth.currentUser) return;
-    
-    try {
-      const userProgressRef = doc(database, "Users", auth.currentUser.uid);
-      const userProgressRef2 = doc(userProgressRef, "UserProgress");
-      const docSnap = await getDoc(userProgressRef, "UserProgress");
-      const docSnap2 = await getDoc(userProgressRef);
-      if (docSnap.exists()) {
-        await updateDoc(userProgressRef2, {
-          "level1.round1": userChoices
-        });
-      } else {
-        await setDoc(userProgressRef, {
-          "level1": {
-            "round1": userChoices
-          }
-        });
-      }
-      if (docSnap2.exists()) {
-        await updateDoc(userProgressRef, {
-          "level":1,
-          "round":1,
-          "round1_completed": true // Mark Round 1 as completed
-        });
-      } else {
-        await setDoc(userProgressRef, {
-          "level":1,
-          "round":1,
-          "level1": {
-            "round1": userChoices
-          },
-          "round1_completed": true // Mark Round 1 as completed
-        });
-      }
-      console.log("Progress saved successfully");
-    } catch (error) {
-      console.error("Error saving progress:", error);
-    }
+    await saveProgress('level1', 'round1', userChoices);
   };
 
   const handleJobSelection = (job) => {
@@ -342,6 +329,7 @@ const Round1 = () => {
     }));
     
     setSelectedJobType(jobType);
+    setIsTransitioning(true);
     
     // Show mascot dialogue first with job description
     setMascotDialogues([
@@ -349,8 +337,8 @@ const Round1 = () => {
     ]);
     setCurrentDialogueIndex(0);
     
-    // Transition to salary options after job description dialogue finishes (handled in nextDialogue)
-    setShowJobOptions(false);
+    // Don't hide job options immediately - let nextDialogue handle the transition
+    // setShowJobOptions(false); // REMOVED - this was causing the blank screen
   };
   
   const handleSalaryChoice = (choice) => {
@@ -398,8 +386,8 @@ const Round1 = () => {
     // Move to summary after a delay, allowing both dialogues to play
     // This will be handled by the nextDialogue calling setShowSummary(true) when all dialogues are done.
     setShowSalaryOptions(false);
-    setShowSummary(true); // Direct to summary after choice and feedback
-    saveUserProgress();
+    // setShowSummary(true); // Direct to summary after choice and feedback - REMOVED
+    // saveUserProgress(); // Moved saving to when summary is displayed
   };
 
   return (
@@ -483,8 +471,12 @@ const Round1 = () => {
                 <div className="space-y-4">
                   {/* MNC Job Option */}
                   <div 
-                    className="bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-5 rounded-2xl border-2 border-[#374151] hover:border-[#58cc02] active:scale-95 transition-all cursor-pointer shadow-lg hover:shadow-xl"
-                    onClick={() => handleJobSelection('MNC Job')}
+                    className={`bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-5 rounded-2xl border-2 transition-all shadow-lg ${
+                      isTransitioning 
+                        ? 'border-[#374151] opacity-60 cursor-not-allowed' 
+                        : 'border-[#374151] hover:border-[#58cc02] active:scale-95 cursor-pointer hover:shadow-xl'
+                    }`}
+                    onClick={() => !isTransitioning && handleJobSelection('MNC Job')}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -516,8 +508,12 @@ const Round1 = () => {
                   
                   {/* Startup Job Option */}
                   <div 
-                    className="bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-5 rounded-2xl border-2 border-[#374151] hover:border-[#58cc02] active:scale-95 transition-all cursor-pointer shadow-lg hover:shadow-xl"
-                    onClick={() => handleJobSelection('Startup Job')}
+                    className={`bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-5 rounded-2xl border-2 transition-all shadow-lg ${
+                      isTransitioning 
+                        ? 'border-[#374151] opacity-60 cursor-not-allowed' 
+                        : 'border-[#374151] hover:border-[#58cc02] active:scale-95 cursor-pointer hover:shadow-xl'
+                    }`}
+                    onClick={() => !isTransitioning && handleJobSelection('Startup Job')}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -549,8 +545,12 @@ const Round1 = () => {
                   
                   {/* Government Exams Option */}
                   <div 
-                    className="bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-5 rounded-2xl border-2 border-[#374151] hover:border-[#58cc02] active:scale-95 transition-all cursor-pointer shadow-lg hover:shadow-xl"
-                    onClick={() => handleJobSelection('Government Exams')}
+                    className={`bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-5 rounded-2xl border-2 transition-all shadow-lg ${
+                      isTransitioning 
+                        ? 'border-[#374151] opacity-60 cursor-not-allowed' 
+                        : 'border-[#374151] hover:border-[#58cc02] active:scale-95 cursor-pointer hover:shadow-xl'
+                    }`}
+                    onClick={() => !isTransitioning && handleJobSelection('Government Exams')}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -697,11 +697,7 @@ const Round1 = () => {
                   <div className="pt-4">
                     <button 
                       className="w-full py-4 bg-gradient-to-r from-[#58cc02] to-[#2fa946] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
-                      onClick={() => {
-                        // Navigate to next round or level
-                        // For now, let's go to a placeholder for Level 1 Home or Round 2
-                        window.location.href = '/level1/round2'; // This will be updated with proper routing later
-                      }}
+                      onClick={() => navigate('/level1/round2')}
                     >
                       <span>Continue to Next Round</span>
                       <span className="text-xl">🚀</span>

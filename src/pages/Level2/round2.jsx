@@ -5,6 +5,8 @@ import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import RoundIntroModal from '../../components/lessons/RoundIntroModal';
 import GuideScreen from '../../components/lessons/GuideScreen';
 import MascotDialogue from '../../components/lessons/MascotDialogue';
+import { useNavigate } from 'react-router-dom';
+import { saveUserProgress as saveProgress } from '../../utils/firebaseUtils';
 
 const Round2 = () => {
   const [showIntro, setShowIntro] = useState(true);
@@ -38,6 +40,7 @@ const Round2 = () => {
   const [selectedHospitalType, setSelectedHospitalType] = useState(null);
 
   const speechSynthesisRef = useRef(window.speechSynthesis);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadVoices = () => {
@@ -212,19 +215,15 @@ const Round2 = () => {
   useEffect(() => {
     if (mascotDialogues.length > 0 && currentDialogueIndex < mascotDialogues.length) {
       playCurrentDialogue();
+    } else if (showSummary) {
+      saveUserProgress();
     }
-  }, [currentDialogueIndex, mascotDialogues]);
+  }, [currentDialogueIndex, mascotDialogues, showSummary]);
 
   const saveUserProgress = async () => {
     if (!auth.currentUser) return;
     try {
-      const userProgressRef = doc(database, "Users", auth.currentUser.uid);
-      const docSnap = await getDoc(userProgressRef);
-      if (docSnap.exists()) {
-        await updateDoc(userProgressRef, { "level2.round2": userChoices, "round2_completed": true });
-      } else {
-        await setDoc(userProgressRef, { "level2": { "round2": userChoices }, "round2_completed": true });
-      }
+      await saveProgress(2, 2, userChoices);
       console.log("Level 2 Round 2 Progress saved successfully");
     } catch (error) {
       console.error("Error saving progress:", error);
@@ -880,10 +879,7 @@ const Round2 = () => {
                   <div className="pt-4">
                     <button 
                       className="w-full py-4 bg-gradient-to-r from-[#58cc02] to-[#2fa946] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
-                      onClick={() => {
-                        saveUserProgress();
-                        window.location.href = '/level2/round3';
-                      }}
+                      onClick={() => navigate('/level2/round3')}
                     >
                       <span>Continue to Next Round</span>
                       <span className="text-xl">🚀</span>

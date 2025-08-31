@@ -1,14 +1,13 @@
-import React from 'react'
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { auth, database } from '../../config/firebase';
 import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import RoundIntroModal from '../../components/lessons/RoundIntroModal';
 import GuideScreen from '../../components/lessons/GuideScreen';
 import MascotDialogue from '../../components/lessons/MascotDialogue';
-import level11Audio from '../../assets/level11.mp3'; // Re-using audio, consider new ones if available
 import { useNavigate } from 'react-router-dom';
+import { saveUserProgress } from '../../utils/firebaseUtils';
 
-const Round2 = () => {
+const Round1 = () => {
   const [showIntro, setShowIntro] = useState(true);
   const [showGuide, setShowGuide] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -18,11 +17,11 @@ const Round2 = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [userChoices, setUserChoices] = useState({
     selectedOption: null,
-    salary: 0,
+    money: null,
     risk: null,
     growth: null,
-    consequence: null,
-    miniEventImpact: null,
+    stability: null,
+    miniEventOutcome: null,
   });
 
   const speechSynthesisRef = useRef(window.speechSynthesis);
@@ -30,21 +29,11 @@ const Round2 = () => {
 
   useEffect(() => {
     const loadVoices = () => {
-      const availableVoices = window.speechSynthesis.getVoices();
-      console.log('Voices loaded:', availableVoices.length, 'voices available');
+      window.speechSynthesis.getVoices();
     };
     loadVoices();
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
       window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-    if (window.speechSynthesis.getVoices().length === 0) {
-      try {
-        const emptyUtterance = new SpeechSynthesisUtterance('');
-        emptyUtterance.onend = () => { loadVoices(); };
-        window.speechSynthesis.speak(emptyUtterance);
-      } catch (error) {
-        console.log('Could not trigger voice loading, will wait for onvoiceschanged');
-      }
     }
     return () => {
       if (speechSynthesisRef.current) {
@@ -54,12 +43,19 @@ const Round2 = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (mascotDialogues.length > 0 && currentDialogueIndex < mascotDialogues.length) {
+      playCurrentDialogue();
+    } else if (showSummary) {
+      saveUserProgress('level5', 'round1', userChoices);
+    }
+  }, [currentDialogueIndex, mascotDialogues, showSummary, userChoices]);
+
   const speakText = (text) => {
     if (!text || !text.trim()) return;
     if (speechSynthesisRef.current.speaking) {
       speechSynthesisRef.current.cancel();
     }
-
     try {
       const utterance = new window.SpeechSynthesisUtterance(text);
       const speakWithVoice = () => {
@@ -79,18 +75,14 @@ const Round2 = () => {
         if (preferredVoice) {
           utterance.voice = preferredVoice;
         }
-
         utterance.pitch = 1.2;
         utterance.rate = 0.9;
         utterance.volume = 1.0;
-
         utterance.onstart = () => { setIsSpeaking(true); };
         utterance.onend = () => { setIsSpeaking(false); };
         utterance.onerror = (event) => { console.error('Speech error:', event); setIsSpeaking(false); };
-
         speechSynthesisRef.current.speak(utterance);
       };
-
       if (window.speechSynthesis.getVoices().length > 0) {
         speakWithVoice();
       } else {
@@ -100,11 +92,7 @@ const Round2 = () => {
         };
         window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
         setTimeout(() => {
-          if (window.speechSynthesis.getVoices().length > 0) {
-            speakWithVoice();
-          } else {
-            speakWithVoice();
-          }
+          if (window.speechSynthesis.getVoices().length > 0) { speakWithVoice(); } else { speakWithVoice(); }
         }, 1000);
       }
     } catch (err) {
@@ -120,141 +108,125 @@ const Round2 = () => {
     }
   };
 
-  const handleStartJourney = () => {
-    setShowIntro(false);
-    setShowGuide(true);
-  };
-
-  const handleContinue = () => {
-    setShowGuide(false);
-    setShowOptions(true);
-    setMascotDialogues([
-      { text: "You're in your peak earning years, but the corporate ladder is getting crowded. Time to decide: climb higher or jump ship?", audioSrc: null }
-    ]);
-    setCurrentDialogueIndex(0);
-  };
-
   const playCurrentDialogue = () => {
     const currentDialogue = mascotDialogues[currentDialogueIndex];
     if (!currentDialogue) return;
     stopSpeaking();
-    if (currentDialogue.audioSrc) {
-      try {
-        const audio = new Audio(currentDialogue.audioSrc);
-        audio.onloadeddata = () => { audio.play().catch(error => { console.log('Audio playback failed, using TTS:', error); speakText(currentDialogue.text); }); };
-        audio.onerror = () => { speakText(currentDialogue.text); };
-      } catch (error) {
-        speakText(currentDialogue.text);
-      }
-    } else {
-      speakText(currentDialogue.text);
-    }
+    speakText(currentDialogue.text);
   };
-
-  useEffect(() => {
-    if (mascotDialogues.length > 0 && currentDialogueIndex < mascotDialogues.length) {
-      playCurrentDialogue();
-    } else if (showSummary) {
-      saveUserProgress(userChoices);
-    }
-  }, [currentDialogueIndex, mascotDialogues, showSummary, userChoices]);
 
   const nextDialogue = () => {
     if (currentDialogueIndex < mascotDialogues.length - 1) {
       setCurrentDialogueIndex(prev => prev + 1);
     } else {
       console.log('All dialogues completed');
-      setShowOptions(true); // Ensure options are visible after initial dialogue
+      if (userChoices.selectedOption === null) {
+        setShowOptions(true);
+      } else {
+        setShowSummary(true);
+      }
     }
   };
 
-  const saveUserProgress = async (roundOutcome) => {
-    if (!auth.currentUser) return;
-    try {
-      const userProgressRef = doc(database, "Users", auth.currentUser.uid);
-      await updateDoc(userProgressRef, {
-        'level3.round2_completed': true,
-        'level3.round2': roundOutcome,
-        'level': 3,
-        'round': 2,
-      }, { merge: true });
-      console.log("Progress saved successfully");
-    } catch (error) {
-      console.error("Error saving progress:", error);
-    }
+  const handleStartRound = () => {
+    setShowIntro(false);
+    setShowGuide(true);
+  };
+
+  const handleGuideComplete = () => {
+    setShowGuide(false);
+    setMascotDialogues([
+      { text: "You’re 54 now. Retirement is around the corner. Your company offers a buyout option for your pension fund. Big choice coming up!", speaker: "Mascot" },
+    ]);
+    setCurrentDialogueIndex(0);
   };
 
   const handleOptionSelection = (optionType) => {
     stopSpeaking();
-    let selectedSalary = 0;
+    let selectedMoney = '';
     let selectedRisk = '';
     let selectedGrowth = '';
-    let selectedConsequence = '';
-    let miniEventImpact = '';
+    let selectedStability = '';
+    let miniEventText = '';
     let feedbackDialogue = '';
 
     switch (optionType) {
-      case 'Chase Senior Leadership Role':
-        selectedSalary = '₹25-35L/year potential';
+      case 'Take Full Lump Sum Now':
+        selectedMoney = '₹50L instantly';
+        selectedRisk = 'High (You must manage it wisely)';
+        selectedGrowth = 'Depends on your investments';
+        selectedStability = '❌';
+        miniEventText = "Inflation Monster Appears: After 10 years, expenses double → Pension covers barely half of needs.";
+        feedbackDialogue = 'You get a huge amount now, but no steady monthly income later. You decide your financial destiny.';
+        break;
+      case 'Keep Monthly Pension':
+        selectedMoney = '₹35K for life';
+        selectedRisk = 'Low';
+        selectedGrowth = 'Nil';
+        selectedStability = '✅';
+        miniEventText = "Inflation Monster Appears: After 10 years, expenses double → Pension covers barely half of needs.";
+        feedbackDialogue = 'Safe choice. Monthly pension is stable but inflation eats value over time.';
+        break;
+      case 'Invest Lump Sum in Balanced Mutual Funds':
+        selectedMoney = '₹50L → can grow to ₹75L in 10 years or crash to ₹30L';
         selectedRisk = 'Medium';
-        selectedGrowth = 'Corporate politics, long hours, high stress';
-        selectedConsequence = 'Big money, burnt relationships, health issues';
-        miniEventImpact = 'Golden parachute or first to be fired';
-        feedbackDialogue = 'Ambitious! Aiming for leadership can bring great rewards, but be ready for the challenges that come with it.';
+        selectedGrowth = 'Potentially High';
+        selectedStability = '❌';
+        miniEventText = "Inflation Monster Appears: Market rises = jackpot; Market crashes = sleepless nights.";
+        feedbackDialogue = 'Risk-reward game. Market decides your fate.';
         break;
-      case 'Switch to Entrepreneurship':
-        selectedSalary = '₹0-50L/year (highly unpredictable)';
-        selectedRisk = 'Very High';
-        selectedGrowth = 'Unlimited if successful';
-        selectedConsequence = 'Freedom + family financial stress for 2-3 years';
-        miniEventImpact = 'Adapt quickly or sink completely';
-        feedbackDialogue = 'A true leap of faith! Entrepreneurship offers immense potential, but comes with significant risks.';
-        break;
-      case 'Consultant/Freelancer Transition':
-        selectedSalary = '₹20-30L/year if established';
-        selectedRisk = 'Medium';
-        selectedGrowth = 'Work-life balance, location independence';
-        selectedConsequence = 'Irregular income, no corporate benefits';
-        miniEventImpact = 'Client projects dry up temporarily';
-        feedbackDialogue = 'Flexibility is great! As a consultant, you control your work, but income stability can be a concern.';
-        break;
-      case 'Stay in Comfort Zone':
-        selectedSalary = 'Current ₹15-18L with annual increments';
-        selectedRisk = 'Very Low';
-        selectedGrowth = 'Minimal, inflation-adjusted';
-        selectedConsequence = 'Safe but unfulfilled, regrets at 50';
-        miniEventImpact = 'Layoffs hit, no backup skills';
-        feedbackDialogue = 'Playing it safe. While comfortable now, avoiding growth can lead to stagnation later.';
+      case 'Split the Amount':
+        selectedMoney = '₹25L in pension, ₹25L in investment';
+        selectedRisk = 'Balanced';
+        selectedGrowth = 'Moderate';
+        selectedStability = 'Medium';
+        miniEventText = "Inflation Monster Appears: Stable backup, smaller growth.";
+        feedbackDialogue = 'Neither too safe nor too risky. A hedge against both inflation and market crash.';
         break;
       default:
         break;
     }
 
-    const roundOutcome = {
+    setUserChoices({
       selectedOption: optionType,
-      salary: selectedSalary,
+      money: selectedMoney,
       risk: selectedRisk,
       growth: selectedGrowth,
-      consequence: selectedConsequence,
-      miniEventImpact: miniEventImpact,
-    };
-    setUserChoices(roundOutcome);
+      stability: selectedStability,
+      miniEventOutcome: miniEventText,
+    });
 
     setMascotDialogues([
-      { text: feedbackDialogue, audioSrc: null },
-      { text: `Mini Event – Industry Disruption/Recession: ${miniEventImpact}`, audioSrc: null }
+      { text: feedbackDialogue, speaker: "Mascot" },
+      { text: `Mini Event: ${miniEventText}`, speaker: "Mascot" }
     ]);
     setCurrentDialogueIndex(0);
-
     setShowOptions(false);
-    setShowSummary(true);
-    saveUserProgress(roundOutcome);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a1f2e] to-[#111827] text-white overflow-hidden">
-      {showIntro && <RoundIntroModal onClose={handleStartJourney} />}
-      {showGuide && <GuideScreen onNext={handleContinue} />}
+      {showIntro && (
+        <RoundIntroModal
+          title="Round 1: Retirement Fund Dilemma"
+          description="At 54, you face a big decision about your pension fund. Will you take a lump sum, a monthly pension, or invest for growth?"
+          onStart={handleStartRound}
+        />
+      )}
+
+      {showGuide && (
+        <GuideScreen
+          title="Retirement Fund Guide"
+          content={[
+            "Your pension fund is a critical asset for retirement. Understanding your options is key.",
+            "A lump sum offers immediate control but requires disciplined investment to last a lifetime.",
+            "A monthly pension provides stable income but may not keep pace with inflation.",
+            "Investing the lump sum in mutual funds can offer growth, but comes with market risks.",
+            "A split option balances stability and growth, hedging against various risks.",
+          ]}
+          onComplete={handleGuideComplete}
+        />
+      )}
 
       {(showOptions || showSummary) && (
         <div className="flex flex-col min-h-screen">
@@ -264,8 +236,8 @@ const Round2 = () => {
                 <div className="flex-1 bg-[#374151] rounded-full h-3">
                   <div 
                     className="bg-gradient-to-r from-[#58cc02] to-[#2fa946] h-3 rounded-full transition-all duration-500"
-                    style={{ 
-                      width: showOptions ? '50%' : 
+                    style={{
+                      width: showOptions ? '50%' :
                              showSummary ? '100%' : '0%'
                     }}
                   ></div>
@@ -275,8 +247,8 @@ const Round2 = () => {
                 </span>
               </div>
               <h1 className="text-xl md:text-2xl font-bold text-center text-white">
-                {showOptions && "Age 38–39 – Career Peak or Plateau"}
-                {showSummary && "Round 2 Complete!"}
+                {showOptions && "Age 54–55 – Retirement Fund Dilemma"}
+                {showSummary && "Round 1 Complete!"}
               </h1>
             </div>
           </div>
@@ -300,85 +272,81 @@ const Round2 = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="flex-1 overflow-y-auto p-4 pb-6">
             <div className="max-w-2xl mx-auto">
-              
               {showOptions && (
                 <div className="space-y-4">
-                  {/* Option 1: Chase Senior Leadership Role */}
+                  <h2 className="text-2xl font-bold text-white mb-4 text-center">Choose Your Pension Strategy</h2>
                   <div 
                     className="bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-5 rounded-2xl border-2 border-[#374151] hover:border-[#58cc02] active:scale-95 transition-all cursor-pointer shadow-lg hover:shadow-xl"
-                    onClick={() => handleOptionSelection('Chase Senior Leadership Role')}
+                    onClick={() => handleOptionSelection('Take Full Lump Sum Now')}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="text-lg md:text-xl font-bold text-white mb-1">Chase Senior Leadership Role</h3>
-                        <p className="text-[#58cc02] font-bold text-xl">Salary: ₹25-35L/year potential</p>
+                        <h3 className="text-lg md:text-xl font-bold text-white mb-1">Take Full Lump Sum Now</h3>
+                        <p className="text-[#58cc02] font-bold text-xl">Money: ₹50L instantly</p>
                       </div>
-                      <div className="text-3xl">🪜</div>
+                      <div className="text-3xl">💰</div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-300">
-                      <p>Risk: Medium</p>
-                      <p>Growth: Corporate politics, long hours, high stress</p>
-                      <p className="col-span-2">Consequence: Big money, burnt relationships, health issues</p>
-                    </div>
-                  </div>
-                  
-                  {/* Option 2: Switch to Entrepreneurship */}
-                  <div 
-                    className="bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-5 rounded-2xl border-2 border-[#374151] hover:border-[#58cc02] active:scale-95 transition-all cursor-pointer shadow-lg hover:shadow-xl"
-                    onClick={() => handleOptionSelection('Switch to Entrepreneurship')}
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-lg md:text-xl font-bold text-white mb-1">Switch to Entrepreneurship</h3>
-                        <p className="text-orange-400 font-bold text-xl">Income: ₹0-50L/year (highly unpredictable)</p>
-                      </div>
-                      <div className="text-3xl">🚀</div>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-300">
-                      <p>Risk: Very High</p>
-                      <p>Growth: Unlimited if successful</p>
-                      <p className="col-span-2">Consequence: Freedom + family financial stress for 2-3 years</p>
+                      <p>Risk: High (You must manage it wisely)</p>
+                      <p>Growth: Depends on your investments</p>
+                      <p className="col-span-2">Stability: ❌</p>
                     </div>
                   </div>
 
-                  {/* Option 3: Consultant/Freelancer Transition */}
                   <div 
                     className="bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-5 rounded-2xl border-2 border-[#374151] hover:border-[#58cc02] active:scale-95 transition-all cursor-pointer shadow-lg hover:shadow-xl"
-                    onClick={() => handleOptionSelection('Consultant/Freelancer Transition')}
+                    onClick={() => handleOptionSelection('Keep Monthly Pension')}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="text-lg md:text-xl font-bold text-white mb-1">Consultant/Freelancer Transition</h3>
-                        <p className="text-red-500 font-bold text-xl">Income: ₹20-30L/year if established</p>
+                        <h3 className="text-lg md:text-xl font-bold text-white mb-1">Keep Monthly Pension</h3>
+                        <p className="text-orange-400 font-bold text-xl">Monthly Income: ₹35K for life</p>
                       </div>
-                      <div className="text-3xl">💼</div>
+                      <div className="text-3xl">💵</div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-300">
-                      <p>Risk: Medium</p>
-                      <p>Growth: Work-life balance, location independence</p>
-                      <p className="col-span-2">Consequence: Irregular income, no corporate benefits</p>
+                      <p>Risk: Low</p>
+                      <p>Growth: Nil</p>
+                      <p className="col-span-2">Stability: ✅</p>
                     </div>
                   </div>
 
-                  {/* Option 4: Stay in Comfort Zone */}
                   <div 
                     className="bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-5 rounded-2xl border-2 border-[#374151] hover:border-[#58cc02] active:scale-95 transition-all cursor-pointer shadow-lg hover:shadow-xl"
-                    onClick={() => handleOptionSelection('Stay in Comfort Zone')}
+                    onClick={() => handleOptionSelection('Invest Lump Sum in Balanced Mutual Funds')}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="text-lg md:text-xl font-bold text-white mb-1">Stay in Comfort Zone</h3>
-                        <p className="text-purple-400 font-bold text-xl">Salary: Current ₹15-18L with annual increments</p>
+                        <h3 className="text-lg md:text-xl font-bold text-white mb-1">Invest Lump Sum in Balanced Mutual Funds</h3>
+                        <p className="text-red-500 font-bold text-xl">Initial: ₹50L → can grow to ₹75L in 10 years or crash to ₹30L</p>
                       </div>
-                      <div className="text-3xl">🧘</div>
+                      <div className="text-3xl">📈</div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-300">
-                      <p>Risk: Very Low</p>
-                      <p>Growth: Minimal, inflation-adjusted</p>
-                      <p className="col-span-2">Consequence: Safe but unfulfilled, regrets at 50</p>
+                      <p>Risk: Medium</p>
+                      <p>Growth: Potentially High</p>
+                      <p className="col-span-2">Stability: ❌</p>
+                    </div>
+                  </div>
+
+                  <div 
+                    className="bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-5 rounded-2xl border-2 border-[#374151] hover:border-[#58cc02] active:scale-95 transition-all cursor-pointer shadow-lg hover:shadow-xl"
+                    onClick={() => handleOptionSelection('Split the Amount')}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-lg md:text-xl font-bold text-white mb-1">Split the Amount</h3>
+                        <p className="text-purple-400 font-bold text-xl">Money: ₹25L in pension, ₹25L in investment</p>
+                      </div>
+                      <div className="text-3xl">📊</div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-300">
+                      <p>Risk: Balanced</p>
+                      <p>Growth: Moderate</p>
+                      <p className="col-span-2">Stability: Medium</p>
                     </div>
                   </div>
                 </div>
@@ -388,68 +356,56 @@ const Round2 = () => {
                 <div className="space-y-6">
                   <div className="text-center py-6">
                     <div className="text-6xl mb-4">🎉</div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-[#58cc02] mb-2">Great Job!</h2>
-                    <p className="text-gray-300">You've made a crucial career decision.</p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-[#58cc02] mb-2">Round 1 Complete!</h2>
+                    <p className="text-gray-300">You've made a crucial decision about your retirement funds!</p>
                   </div>
-                  
+
                   <div className="bg-gradient-to-r from-[#1e293b] to-[#2d3748] p-6 rounded-2xl border-2 border-[#374151] shadow-xl">
                     <h3 className="text-xl font-bold mb-4 text-white text-center flex items-center justify-center gap-2">
-                      <span>📊</span> Your Round 2 Choices
+                      <span>📊</span> Your Round 1 Choices
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="bg-white/5 p-4 rounded-xl">
                         <p className="text-gray-400 text-sm mb-1">Selected Option</p>
                         <p className="font-bold text-white text-lg">{userChoices.selectedOption || 'N/A'}</p>
                       </div>
                       <div className="bg-white/5 p-4 rounded-xl">
-                        <p className="text-gray-400 text-sm mb-1">Salary/Income</p>
-                        <p className="font-bold text-white text-lg">{userChoices.salary || 'N/A'}</p>
+                        <p className="text-gray-400 text-sm mb-1">Money Impact</p>
+                        <p className="font-bold text-white text-lg">{userChoices.money || 'N/A'}</p>
                       </div>
                       <div className="bg-white/5 p-4 rounded-xl">
-                        <p className="text-gray-400 text-sm mb-1">Risk</p>
-                        <p className="font-bold text-white text-lg">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            userChoices.risk === 'Very Low' ? 'bg-green-500/20 text-green-400' :
-                            userChoices.risk === 'Low' ? 'bg-lime-500/20 text-lime-400' :
-                            userChoices.risk === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                            userChoices.risk === 'Very High' ? 'bg-red-500/20 text-red-400' :
-                            'bg-gray-500/20 text-gray-400'
-                          }`}>
-                            {userChoices.risk}
-                          </span>
-                        </p>
+                        <p className="text-gray-400 text-sm mb-1">Risk Level</p>
+                        <p className="font-bold text-white text-lg">{userChoices.risk || 'N/A'}</p>
                       </div>
                       <div className="bg-white/5 p-4 rounded-xl">
-                        <p className="text-gray-400 text-sm mb-1">Growth/Benefit</p>
+                        <p className="text-gray-400 text-sm mb-1">Growth Potential</p>
                         <p className="font-bold text-white text-lg">{userChoices.growth || 'N/A'}</p>
                       </div>
-                      <div className="bg-white/5 p-4 rounded-xl col-span-2">
-                        <p className="text-gray-400 text-sm mb-1">Consequence</p>
-                        <p className="font-bold text-white text-lg">{userChoices.consequence || 'N/A'}</p>
+                      <div className="bg-white/5 p-4 rounded-xl">
+                        <p className="text-gray-400 text-sm mb-1">Stability</p>
+                        <p className="font-bold text-white text-lg">{userChoices.stability || 'N/A'}</p>
                       </div>
                       <div className="bg-white/5 p-4 rounded-xl col-span-2">
-                        <p className="text-gray-400 text-sm mb-1">Mini Event Impact (Industry Disruption/Recession)</p>
-                        <p className="font-bold text-white text-lg">{userChoices.miniEventImpact || 'N/A'}</p>
+                        <p className="text-gray-400 text-sm mb-1">Mini Event Outcome</p>
+                        <p className="font-bold text-white text-lg">{userChoices.miniEventOutcome || 'N/A'}</p>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="bg-gradient-to-r from-[#58cc02]/10 to-[#2fa946]/10 p-6 rounded-2xl border-2 border-[#58cc02]/30">
-                    <h3 className="text-xl font-bold mb-3 text-[#58cc02] flex items-center justify-center gap-2">
+                    <h3 className="text-xl font-bold mb-3 text-[#58cc02] flex items-center gap-2">
                       <span>💡</span> Financial Lesson
                     </h3>
                     <p className="text-gray-300 leading-relaxed">
-                      "Career decisions in your prime earning years significantly impact your financial trajectory. Weighing growth, stability, and personal fulfillment is key, especially when considering market volatility."
+                      "Retirement fund decisions are critical. A lump sum offers control but demands wise management, while a pension provides stability but loses value to inflation. Balance risk and reward based on your financial goals."
                     </p>
                   </div>
-                  
+
                   <div className="pt-4">
                     <button 
                       className="w-full py-4 bg-gradient-to-r from-[#58cc02] to-[#2fa946] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
-                      onClick={() => {
-                        navigate('/level3/round3');
-                      }}
+                      onClick={() => navigate('/level5/round2')}
                     >
                       <span>Continue to Next Round</span>
                       <span className="text-xl">🚀</span>
@@ -465,4 +421,4 @@ const Round2 = () => {
   );
 };
 
-export default Round2;
+export default Round1;

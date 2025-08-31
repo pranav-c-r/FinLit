@@ -6,6 +6,7 @@ import RoundIntroModal from '../../components/lessons/RoundIntroModal';
 import GuideScreen from '../../components/lessons/GuideScreen';
 import MascotDialogue from '../../components/lessons/MascotDialogue';
 import level11Audio from '../../assets/level11.mp3'; // Re-using audio, consider new ones if available
+import { useNavigate } from 'react-router-dom';
 
 const Round5 = () => {
   const [showIntro, setShowIntro] = useState(true);
@@ -25,6 +26,7 @@ const Round5 = () => {
   });
 
   const speechSynthesisRef = useRef(window.speechSynthesis);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadVoices = () => {
@@ -152,8 +154,10 @@ const Round5 = () => {
   useEffect(() => {
     if (mascotDialogues.length > 0 && currentDialogueIndex < mascotDialogues.length) {
       playCurrentDialogue();
+    } else if (showSummary) {
+      saveUserProgress(userChoices);
     }
-  }, [currentDialogueIndex, mascotDialogues]);
+  }, [currentDialogueIndex, mascotDialogues, showSummary, userChoices]);
 
   const nextDialogue = () => {
     if (currentDialogueIndex < mascotDialogues.length - 1) {
@@ -244,7 +248,6 @@ const Round5 = () => {
 
     setShowOptions(false);
     setShowSummary(true);
-    saveUserProgress(roundOutcome);
   };
 
   return (
@@ -443,7 +446,7 @@ const Round5 = () => {
                     <button 
                       className="w-full py-4 bg-gradient-to-r from-[#58cc02] to-[#2fa946] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
                       onClick={() => {
-                        window.location.href = '/level3'; // Or to a final summary page
+                        navigate('/levels'); // Or to a final summary page
                       }}
                     >
                       <span>Return to Level 3 Overview</span>

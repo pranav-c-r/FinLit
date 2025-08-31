@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 
-const Header = () => {
+const Header = ({ toggleSidebar }) => {
   const { state } = useApp();
   const { user } = state;
   const [isExpanded, setIsExpanded] = useState(false);
@@ -21,6 +21,16 @@ const Header = () => {
   return (
     <header className="bg-background-DEFAULT p-4 border-b border-accent sticky top-0 z-50 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
+        {/* Hamburger menu icon for mobile */}
+        <button 
+          className="md:hidden text-white mr-4 focus:outline-none"
+          onClick={toggleSidebar}
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
         {/* Logo with animation */}
         <div className="flex items-center">
           <div className="text-2xl font-bold relative">
