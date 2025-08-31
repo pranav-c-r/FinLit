@@ -14,7 +14,7 @@ body {
   font-family: 'Poppins', sans-serif;
   color: white;
   line-height: 1.6;
-  background-color: theme('colors.background.DEFAULT');
+  background-color: #1a1f2e; /* background.DEFAULT from your config */
   overflow-x: hidden;
 }
 
@@ -23,202 +23,216 @@ body {
   position: relative;
 }
 
-/* Game UI Elements */
-.game-card {
-  background: rgba(23, 23, 23, 0.85);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(110, 255, 0, 0.3);
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 15px -3px rgba(110, 255, 0, 0.25);
-  transition: all 0.3s;
-  background-image: linear-gradient(135deg, rgba(110, 255, 0, 0.05), rgba(0, 225, 255, 0.03), rgba(255, 221, 0, 0.02));
-}
+/* Define custom layer for your components */
+@layer components {
+  /* Game UI Elements */
+  .game-card {
+    background-color: rgba(17, 24, 39, 0.85); /* background-dark with 85% opacity */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(110, 255, 0, 0.3); /* primary-light with 30% opacity */
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(110, 255, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+    background-image: linear-gradient(135deg, rgba(110, 255, 0, 0.05), rgba(0, 225, 255, 0.03), rgba(255, 221, 0, 0.02));
+  }
+  .game-card:hover {
+    box-shadow: 0 25px 50px -12px rgba(110, 255, 0, 0.4);
+    border-color: rgba(110, 255, 0, 0.6);
+    transform: scale(1.02);
+  }
 
-.game-card:hover {
-  box-shadow: 0 25px 50px -12px rgba(110, 255, 0, 0.4);
-  border-color: rgba(110, 255, 0, 0.6);
-  transform: scale(1.02);
-}
+  .glass-card {
+    background-color: rgba(17, 24, 39, 0.7); /* background-dark with 70% opacity */
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(110, 255, 0, 0.2); /* primary-light with 20% opacity */
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(110, 255, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+    background-image: linear-gradient(135deg, rgba(110, 255, 0, 0.08), rgba(0, 225, 255, 0.06));
+  }
+  .glass-card:hover {
+    box-shadow: 0 20px 25px -5px rgba(110, 255, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba(110, 255, 0, 0.4);
+  }
 
-.glass-card {
-  background: rgba(23, 23, 23, 0.7);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(110, 255, 0, 0.2);
-  border-radius: 1rem;
-  box-shadow: 0 10px 15px -3px rgba(110, 255, 0, 0.15);
-  transition: all 0.3s;
-  background-image: linear-gradient(135deg, rgba(110, 255, 0, 0.08), rgba(0, 225, 255, 0.06));
-}
+  .neon-card {
+    background-color: rgba(17, 24, 39, 0.9); /* background-dark with 90% opacity */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 221, 0, 0.4); /* secondary-light with 40% opacity */
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(255, 221, 0, 0.3);
+    transition: all 0.3s;
+    background-image: linear-gradient(135deg, rgba(255, 221, 0, 0.08), rgba(255, 149, 0, 0.05));
+  }
+  .neon-card:hover {
+    box-shadow: 0 25px 50px -12px rgba(255, 221, 0, 0.5);
+    border-color: rgba(255, 221, 0, 0.7);
+  }
 
-.glass-card:hover {
-  box-shadow: 0 20px 25px -5px rgba(110, 255, 0, 0.25);
-  border-color: rgba(110, 255, 0, 0.4);
-}
+  .game-panel {
+    background-color: rgba(17, 24, 39, 0.85); /* background-dark with 85% opacity */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 225, 255, 0.3); /* tertiary-light with 30% opacity */
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 225, 255, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    background-image: linear-gradient(135deg, rgba(0, 225, 255, 0.05), rgba(0, 163, 255, 0.03));
+  }
 
-.neon-card {
-  background: rgba(23, 23, 23, 0.9);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 221, 0, 0.4);
-  border-radius: 0.75rem;
-  box-shadow: 0 25px 50px -12px rgba(255, 221, 0, 0.3);
-  transition: all 0.3s;
-  background-image: linear-gradient(135deg, rgba(255, 221, 0, 0.08), rgba(255, 149, 0, 0.05));
-}
+  .game-button {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    transform: translateX(0) translateY(0) rotate(0) skewX(0) skewY(0) scaleX(1) scaleY(1);
+  }
+  .game-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
 
-.neon-card:hover {
-  box-shadow: 0 25px 50px -12px rgba(255, 221, 0, 0.5);
-  border-color: rgba(255, 221, 0, 0.7);
-}
+  /* Gradient Text */
+  .gradient-text {
+    background-image: linear-gradient(to right, #6eff00, #3dd958); /* primary-light to primary */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
-.game-panel {
-  background: rgba(23, 23, 23, 0.85);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 225, 255, 0.3);
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 225, 255, 0.2);
-  background-image: linear-gradient(135deg, rgba(0, 225, 255, 0.05), rgba(0, 163, 255, 0.03));
-}
+  .gradient-text-secondary {
+    background-image: linear-gradient(to right, #ffdd00, #ff9500); /* secondary-light to secondary */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
-.game-button {
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  transition: all 0.3s;
-  transform: translateY(0);
-}
+  .gradient-text-tertiary {
+    background-image: linear-gradient(to right, #00e1ff, #00a3ff); /* tertiary-light to tertiary */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
-.game-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
+  /* Enhanced Gradient Buttons */
+  .gradient-button-primary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    background-image: linear-gradient(to right, #6eff00, #3dd958); /* primary-light to primary */
+    color: black;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    box-shadow: 0 0 20px rgba(110, 255, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+    transform: translateX(0) translateY(0) rotate(0) skewX(0) skewY(0) scaleX(1) scaleY(1);
+  }
+  .gradient-button-primary:hover {
+    box-shadow: 0 20px 25px -5px rgba(110, 255, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: scale(1.1);
+    filter: brightness(1.1);
+  }
 
-/* Gradient Text */
-.gradient-text {
-  background: linear-gradient(to right, #aaff00, #6eff00);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+  .gradient-button-secondary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    background-image: linear-gradient(to right, #ffdd00, #ff9500); /* secondary-light to secondary */
+    color: black;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    box-shadow: 0 0 20px rgba(255, 221, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+    transform: translateX(0) translateY(0) rotate(0) skewX(0) skewY(0) scaleX(1) scaleY(1);
+  }
+  .gradient-button-secondary:hover {
+    box-shadow: 0 20px 25px -5px rgba(255, 221, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: scale(1.1);
+    filter: brightness(1.1);
+  }
 
-.gradient-text-secondary {
-  background: linear-gradient(to right, #ffdd00, #ffd000);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+  .gradient-button-tertiary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    background-image: linear-gradient(to right, #00e1ff, #00a3ff); /* tertiary-light to tertiary */
+    color: black;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    box-shadow: 0 0 20px rgba(0, 225, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+    transform: translateX(0) translateY(0) rotate(0) skewX(0) skewY(0) scaleX(1) scaleY(1);
+  }
+  .gradient-button-tertiary:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 225, 255, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: scale(1.1);
+    filter: brightness(1.1);
+  }
 
-.gradient-text-tertiary {
-  background: linear-gradient(to right, #00e1ff, #00a3ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+  /* Neon button styles */
+  .btn-neon-primary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background-color: transparent;
+    border: 2px solid #6eff00; /* primary-light */
+    color: #6eff00; /* primary-light */
+    border-radius: 0.5rem;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(110, 255, 0, 0.5);
+    text-shadow: 0 0 10px rgba(110, 255, 0, 0.8);
+    transition: all 0.3s;
+  }
+  .btn-neon-primary:hover {
+    background-color: #6eff00; /* primary-light */
+    color: black;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
 
-/* Enhanced Gradient Buttons */
-.gradient-button-primary {
-  padding: 0.5rem 1.5rem;
-  background: linear-gradient(to right, #aaff00, #6eff00);
-  color: black;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  box-shadow: 0 0 20px rgba(110, 255, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.3s;
-  transform: translateY(0);
-}
+  .btn-neon-secondary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background-color: transparent;
+    border: 2px solid #ffdd00; /* secondary-light */
+    color: #ffdd00; /* secondary-light */
+    border-radius: 0.5rem;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(255, 221, 0, 0.5);
+    text-shadow: 0 0 10px rgba(255, 221, 0, 0.8);
+    transition: all 0.3s;
+  }
+  .btn-neon-secondary:hover {
+    background-color: #ffdd00; /* secondary-light */
+    color: black;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
 
-.gradient-button-primary:hover {
-  box-shadow: 0 0 25px rgba(110, 255, 0, 0.6);
-  transform: scale(1.1);
-  filter: brightness(1.1);
-}
-
-.gradient-button-secondary {
-  padding: 0.5rem 1.5rem;
-  background: linear-gradient(to right, #ffdd00, #ffd000);
-  color: black;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  box-shadow: 0 0 20px rgba(255, 221, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.3s;
-  transform: translateY(0);
-}
-
-.gradient-button-secondary:hover {
-  box-shadow: 0 0 25px rgba(255, 221, 0, 0.6);
-  transform: scale(1.1);
-  filter: brightness(1.1);
-}
-
-.gradient-button-tertiary {
-  padding: 0.5rem 1.5rem;
-  background: linear-gradient(to right, #00e1ff, #00a3ff);
-  color: black;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  box-shadow: 0 0 20px rgba(0, 225, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.3s;
-  transform: translateY(0);
-}
-
-.gradient-button-tertiary:hover {
-  box-shadow: 0 0 25px rgba(0, 225, 255, 0.6);
-  transform: scale(1.1);
-  filter: brightness(1.1);
-}
-
-/* Neon button styles */
-.btn-neon-primary {
-  padding: 0.75rem 1.5rem;
-  background: transparent;
-  border: 2px solid #aaff00;
-  color: #aaff00;
-  border-radius: 0.5rem;
-  font-weight: bold;
-  box-shadow: 0 0 15px rgba(110, 255, 0, 0.5);
-  text-shadow: 0 0 10px rgba(110, 255, 0, 0.8);
-  transition: all 0.3s;
-}
-
-.btn-neon-primary:hover {
-  background: #aaff00;
-  color: black;
-  box-shadow: 0 0 25px rgba(110, 255, 0, 0.8);
-}
-
-.btn-neon-secondary {
-  padding: 0.75rem 1.5rem;
-  background: transparent;
-  border: 2px solid #ffdd00;
-  color: #ffdd00;
-  border-radius: 0.5rem;
-  font-weight: bold;
-  box-shadow: 0 0 15px rgba(255, 221, 0, 0.5);
-  text-shadow: 0 0 10px rgba(255, 221, 0, 0.8);
-  transition: all 0.3s;
-}
-
-.btn-neon-secondary:hover {
-  background: #ffdd00;
-  color: black;
-  box-shadow: 0 0 25px rgba(255, 221, 0, 0.8);
-}
-
-.btn-neon-tertiary {
-  padding: 0.75rem 1.5rem;
-  background: transparent;
-  border: 2px solid #00e1ff;
-  color: #00e1ff;
-  border-radius: 0.5rem;
-  font-weight: bold;
-  box-shadow: 0 0 15px rgba(0, 225, 255, 0.5);
-  text-shadow: 0 0 10px rgba(0, 225, 255, 0.8);
-  transition: all 0.3s;
-}
-
-.btn-neon-tertiary:hover {
-  background: #00e1ff;
-  color: black;
-  box-shadow: 0 0 25px rgba(0, 225, 255, 0.8);
+  .btn-neon-tertiary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background-color: transparent;
+    border: 2px solid #00e1ff; /* tertiary-light */
+    color: #00e1ff; /* tertiary-light */
+    border-radius: 0.5rem;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(0, 225, 255, 0.5);
+    text-shadow: 0 0 10px rgba(0, 225, 255, 0.8);
+    transition: all 0.3s;
+  }
+  .btn-neon-tertiary:hover {
+    background-color: #00e1ff; /* tertiary-light */
+    color: black;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
 }
 
 /* Scrollbar Styling */
@@ -227,14 +241,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #171717;
+  background: #111827; /* background-dark from your config */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #aaff00;
+  background: #6eff00; /* primary-light from your config */
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6eff00;
+  background: #3dd958; /* primary from your config */
 }
