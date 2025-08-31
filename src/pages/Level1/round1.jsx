@@ -11,27 +11,22 @@ import ExpenseAllocation from '../../components/lessons/ExpenseAllocation';
 import level11Audio from '../../assets/level11.mp3';
 import oldManVideoSrc from '../../assets/oldman.mp4';
 
-const Level11 = () => {
+const Round1 = () => {
   const [showIntro, setShowIntro] = useState(true);
   const [showGuide, setShowGuide] = useState(false);
   const [showJobOptions, setShowJobOptions] = useState(false);
-  const [showParentScene, setShowParentScene] = useState(false);
-  const [showExpenseAllocation, setShowExpenseAllocation] = useState(false);
   const [showSalaryOptions, setShowSalaryOptions] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [mascotDialogues, setMascotDialogues] = useState([]);
-  const [parentDialogues, setParentDialogues] = useState([]);
   const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [userChoices, setUserChoices] = useState({
     job: null,
-    salary: null,
+    salaryAction: null, // Changed from 'salary' to 'salaryAction' to avoid confusion with money amount
     money: 0,
-    savings: false,
+    savingsHabit: 'No', // Changed from 'savings' to 'savingsHabit' and default to 'No'
     riskLevel: 'Low',
-    happiness: 'Medium',
-    expenses: {},
-    financialPlan: null
+    happiness: 'Stable', // Default to 'Stable'
   });
   const [selectedJobType, setSelectedJobType] = useState(null); // 'mnc', 'startup', or 'government'
   
@@ -193,7 +188,7 @@ const Level11 = () => {
     setShowGuide(false);
     setShowJobOptions(true);
     setMascotDialogues([
-      { text: "You've just graduated! Congratulations! The real world is waiting.", audioSrc: null },
+      { text: "You’ve just graduated! Congratulations! 🎉 The real world is waiting.", audioSrc: null },
       { text: "You now have to pick your first job — this one choice will set the foundation of your money journey.", audioSrc: null }
     ]);
     setCurrentDialogueIndex(0);
@@ -237,6 +232,24 @@ const Level11 = () => {
       setCurrentDialogueIndex(prev => prev + 1);
     } else {
       console.log('All dialogues completed');
+      // After job description, show salary options
+      if (userChoices.job && selectedJobType !== 'government') { // Only show salary options if a job with income was chosen
+        setMascotDialogues([
+          { text: "You receive your first salary / stipend. What will you do with it?", audioSrc: null }
+        ]);
+        setCurrentDialogueIndex(0);
+        setShowSalaryOptions(true);
+      } else if (selectedJobType === 'government') {
+        // If government exams, directly go to summary for now, or add specific dialogue
+        setMascotDialogues([
+          { text: "No income for now, but if you succeed, you’ll have a secure job for life. Let's see your progress.", audioSrc: null }
+        ]);
+        setCurrentDialogueIndex(0);
+        setShowSummary(true);
+      } else {
+        // Fallback for unexpected state, go to summary
+        setShowSummary(true);
+      }
     }
   };
   
@@ -270,13 +283,17 @@ const Level11 = () => {
       if (docSnap2.exists()) {
         await updateDoc(userProgressRef, {
           "level":1,
-          "round":1
+          "round":1,
+          "round1_completed": true // Mark Round 1 as completed
         });
       } else {
         await setDoc(userProgressRef, {
+          "level":1,
+          "round":1,
           "level1": {
             "round1": userChoices
-          }
+          },
+          "round1_completed": true // Mark Round 1 as completed
         });
       }
       console.log("Progress saved successfully");
@@ -332,98 +349,45 @@ const Level11 = () => {
     ]);
     setCurrentDialogueIndex(0);
     
-    // After mascot dialogue, transition to parent scene
+    // Transition to salary options after job description dialogue finishes (handled in nextDialogue)
     setShowJobOptions(false);
-    
-    // Set up parent dialogues based on job choice
-    setTimeout(() => {
-      let parentDialogue = '';
-      
-      switch (jobType) {
-        case 'mnc':
-          parentDialogue = "Son, you're earning ₹75,000 now. That's a very good salary. But remember, money needs planning. How will you split it?";
-          break;
-        case 'startup':
-          parentDialogue = "Son, your salary is just ₹25,000. It's not easy to manage everything with this. But if you are confident, we will support you. Tell us, how will you manage with this amount?";
-          break;
-        case 'government':
-          parentDialogue = "Son, you don't have a salary right now, but you will get one after you succeed. Until then, how will you manage your expenses?";
-          break;
-      }
-      
-      setParentDialogues([
-        { text: parentDialogue, audioSrc: null }
-      ]);
-      
-      setShowParentScene(true);
-    }, 0); // Show parent scene after mascot dialogue finishes
-  };
-  
-  // Handle when parent dialogue ends
-  const handleParentDialogueEnd = () => {
-    // Transition to expense allocation screen
-    setShowParentScene(false);
-    setShowExpenseAllocation(true);
-  };
-  
-  // Handle expense allocation completion
-  const handleExpenseAllocationComplete = (result) => {
-    setUserChoices(prev => ({
-      ...prev,
-      expenses: result.allocations,
-      financialPlan: result.selectedOption,
-      // Update other relevant fields based on the result
-      savings: result.feedback.financial_health === 'excellent' || 
-               result.feedback.financial_health === 'good' || 
-               result.feedback.financial_discipline === 'high',
-      happiness: result.feedback.independence === 'high' ? 'High' : 'Medium'
-    }));
-    
-    // Show summary screen
-    setShowExpenseAllocation(false);
-    setShowSummary(true);
-    saveUserProgress();
   };
   
   const handleSalaryChoice = (choice) => {
     stopSpeaking();
     
-    let happiness = 'Medium';
-    let savings = false;
+    let happiness = userChoices.happiness;
+    let savingsHabit = userChoices.savingsHabit;
     let feedback = '';
+    let consequence = '';
     
     switch (choice) {
       case 'spend':
-        happiness = 'High';
+        happiness = 'Medium ↑'; // Adjusted based on user's prompt
         feedback = "Fun today, broke tomorrow. Careful with overspending!";
+        consequence = "Next month’s rent/expense hits suddenly. Guide says: “See? Money runs out faster than you think.”";
         break;
       case 'save':
-        happiness = 'Medium';
-        savings = true;
+        happiness = 'Stable ↑'; // Adjusted based on user's prompt
+        savingsHabit = 'Yes';
         feedback = "Smart! Saving early builds your financial safety net.";
+        consequence = "Guide shows savings meter go up: “Good! This small habit will help in emergencies later.”";
         break;
       case 'family':
-        happiness = 'High';
-        feedback = "Family first! Good decision, but don't forget to save too.";
+        happiness = 'High ↑'; // Adjusted based on user's prompt
+        feedback = "Family first! Good decision, but don’t forget to save too.";
+        consequence = "Guide says: “Your family feels proud of you. But make sure to also secure your own future.”";
+        break;
+      default:
         break;
     }
     
     setUserChoices(prev => ({
       ...prev,
-      salary: choice,
+      salaryAction: choice,
       happiness: happiness,
-      savings: savings
+      savingsHabit: savingsHabit
     }));
-    
-    // Show consequence based on choice
-    let consequence = '';
-    if (choice === 'spend') {
-      consequence = "Next month's rent/expense hits suddenly. See? Money runs out faster than you think.";
-    } else if (choice === 'save') {
-      consequence = "Good! This small habit will help in emergencies later.";
-    } else {
-      consequence = "Your family feels proud of you. But make sure to also secure your own future.";
-    }
     
     setMascotDialogues([
       { text: feedback, audioSrc: null },
@@ -431,12 +395,11 @@ const Level11 = () => {
     ]);
     setCurrentDialogueIndex(0);
     
-    // Move to summary after a delay
-    setTimeout(() => {
-      setShowSalaryOptions(false);
-      setShowSummary(true);
-      saveUserProgress();
-    }, 5000);
+    // Move to summary after a delay, allowing both dialogues to play
+    // This will be handled by the nextDialogue calling setShowSummary(true) when all dialogues are done.
+    setShowSalaryOptions(false);
+    setShowSummary(true); // Direct to summary after choice and feedback
+    saveUserProgress();
   };
 
   return (
@@ -448,7 +411,7 @@ const Level11 = () => {
       {showGuide && <GuideScreen onNext={handleContinue} />}
       
       {/* Main game interface - Mobile-first design with Duolingo style */}
-      {(showJobOptions || showParentScene || showExpenseAllocation || showSalaryOptions || showSummary) && (
+      {(showJobOptions || showSalaryOptions || showSummary) && (
         <div className="flex flex-col min-h-screen">
           {/* Top Header - Progress and Title */}
           <div className="bg-[#1e293b] p-4 border-b border-[#374151]">
@@ -460,25 +423,20 @@ const Level11 = () => {
                     className="bg-gradient-to-r from-[#58cc02] to-[#2fa946] h-3 rounded-full transition-all duration-500"
                     style={{ 
                       width: showJobOptions ? '20%' : 
-                             showParentScene ? '40%' : 
-                             showExpenseAllocation ? '60%' : 
-                             showSalaryOptions ? '80%' : '100%' 
+                             showSalaryOptions ? '40%' : 
+                             showSummary ? '100%' : '0%' 
                     }}
                   ></div>
                 </div>
                 <span className="text-[#58cc02] font-bold text-sm">
-                  {showJobOptions ? '1/5' : 
-                   showParentScene ? '2/5' : 
-                   showExpenseAllocation ? '3/5' : 
-                   showSalaryOptions ? '4/5' : '5/5'}
+                  {showJobOptions ? '1/3' : 
+                   showSalaryOptions ? '2/3' : '3/3'}
                 </span>
               </div>
               
               {/* Title */}
               <h1 className="text-xl md:text-2xl font-bold text-center text-white">
                 {showJobOptions && "Choose Your First Job"}
-                {showParentScene && "Family Discussion"}
-                {showExpenseAllocation && "Plan Your Finances"}
                 {showSalaryOptions && "Your First Salary"}
                 {showSummary && "Round 1 Complete!"}
               </h1>
@@ -490,12 +448,11 @@ const Level11 = () => {
             <div className="max-w-4xl mx-auto">
               <div className="flex items-center justify-center">
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 max-w-sm w-full">
-                  {showParentScene ? (
-                    <ParentDialogue
-                      dialogues={parentDialogues}
+                  {showJobOptions ? (
+                    <MascotDialogue
+                      dialogues={mascotDialogues}
                       currentDialogueIndex={currentDialogueIndex}
-                      onDialogueEnd={handleParentDialogueEnd}
-                      character="father"
+                      onDialogueEnd={nextDialogue}
                     />
                   ) : (
                     <MascotDialogue
@@ -520,15 +477,6 @@ const Level11 = () => {
           {/* Main Content Area - Scrollable */}
           <div className="flex-1 overflow-y-auto p-4 pb-6">
             <div className="max-w-2xl mx-auto">
-              
-              {/* Expense Allocation */}
-              {showExpenseAllocation && (
-                <ExpenseAllocation 
-                  jobType={selectedJobType}
-                  salary={userChoices.money}
-                  onComplete={handleExpenseAllocationComplete}
-                />
-              )}
               
               {/* Job Options */}
               {showJobOptions && (
@@ -709,12 +657,16 @@ const Level11 = () => {
                       <div className="bg-white/5 p-4 rounded-xl">
                         <p className="text-gray-400 text-sm mb-1">Savings Habit</p>
                         <p className="font-bold text-white text-lg">
-                          {userChoices.savings ? (
+                          {userChoices.savingsHabit === 'Yes' ? (
                             <span className="text-[#58cc02]">✅ Yes</span>
                           ) : (
                             <span className="text-red-400">❌ No</span>
                           )}
                         </p>
+                      </div>
+                      <div className="bg-white/5 p-4 rounded-xl">
+                        <p className="text-gray-400 text-sm mb-1">Happiness Level</p>
+                        <p className="font-bold text-white text-lg">{userChoices.happiness}</p>
                       </div>
                       <div className="bg-white/5 p-4 rounded-xl">
                         <p className="text-gray-400 text-sm mb-1">Risk Level</p>
@@ -737,7 +689,7 @@ const Level11 = () => {
                       <span>💡</span> Financial Lesson
                     </h3>
                     <p className="text-gray-300 leading-relaxed">
-                      "Every rupee choice today changes your tomorrow. Balance between enjoying today and saving for tomorrow is key."
+                      "Every rupee choice today changes your tomorrow. Let’s see how you manage your next years!"
                     </p>
                   </div>
                   
@@ -747,7 +699,8 @@ const Level11 = () => {
                       className="w-full py-4 bg-gradient-to-r from-[#58cc02] to-[#2fa946] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
                       onClick={() => {
                         // Navigate to next round or level
-                        window.location.href = '/home';
+                        // For now, let's go to a placeholder for Level 1 Home or Round 2
+                        window.location.href = '/level1/round2'; // This will be updated with proper routing later
                       }}
                     >
                       <span>Continue to Next Round</span>
@@ -764,4 +717,4 @@ const Level11 = () => {
   );
 };
 
-export default Level11;
+export default Round1;

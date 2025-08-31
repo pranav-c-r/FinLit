@@ -22,7 +22,21 @@ import Achievements from './pages/Achievements';
 import './App.css';
 import './styles/globals.css';
 import SignIn from './pages/signIn';
-import Level11 from './pages/Level1/round1';
+import Round1 from './pages/Level1/round1';
+import Round2 from './pages/Level1/round2';
+import Round3 from './pages/Level1/round3';
+import Round4 from './pages/Level1/round4';
+import Round5 from './pages/Level1/round5';
+import Round6 from './pages/Level1/round6';
+import Level1Overview from './pages/Level1'; // This will be the new index.jsx for Level 1
+
+import Round1Level2 from './pages/Level2/round1';
+import Round2Level2 from './pages/Level2/round2';
+import Round3Level2 from './pages/Level2/round3';
+import Round4Level2 from './pages/Level2/round4';
+import Round5Level2 from './pages/Level2/round5';
+import Round6Level2 from './pages/Level2/round6';
+import Level2Overview from './pages/Level2';
 
 // Game UI Background
 const GameBackground = () => {
@@ -82,11 +96,79 @@ function App() {
               <Landing />
             </PublicLayout>
           } />
-          <Route path="/level11" element={
-            <PublicLayout path="/level11">
-              <Level11 />
-            </PublicLayout>
+          <Route path="/level1" element={
+            <AuthenticatedLayout>
+              <Level1Overview />
+            </AuthenticatedLayout>
           } />
+          <Route path="/level1/round1" element={
+            <AuthenticatedLayout>
+              <Round1 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level1/round2" element={
+            <AuthenticatedLayout>
+              <Round2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level1/round3" element={
+            <AuthenticatedLayout>
+              <Round3 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level1/round4" element={
+            <AuthenticatedLayout>
+              <Round4 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level1/round5" element={
+            <AuthenticatedLayout>
+              <Round5 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level1/round6" element={
+            <AuthenticatedLayout>
+              <Round6 />
+            </AuthenticatedLayout>
+          } />
+
+          {/* Level 2 Routes */}
+          <Route path="/level2" element={
+            <AuthenticatedLayout>
+              <Level2Overview />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round1" element={
+            <AuthenticatedLayout>
+              <Round1Level2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round2" element={
+            <AuthenticatedLayout>
+              <Round2Level2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round3" element={
+            <AuthenticatedLayout>
+              <Round3Level2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round4" element={
+            <AuthenticatedLayout>
+              <Round4Level2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round5" element={
+            <AuthenticatedLayout>
+              <Round5Level2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round6" element={
+            <AuthenticatedLayout>
+              <Round6Level2 />
+            </AuthenticatedLayout>
+          } />
+
           <Route path="/signin" element={
             <PublicLayout path="/signin">
               <SignIn />
