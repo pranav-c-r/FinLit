@@ -25,41 +25,200 @@ body {
 
 /* Game UI Elements */
 .game-card {
-  @apply bg-background-dark/80 backdrop-blur-md border border-accent/50 rounded-xl shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 hover:border-primary/50;
+  background: rgba(23, 23, 23, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(110, 255, 0, 0.3);
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(110, 255, 0, 0.25);
+  transition: all 0.3s;
+  background-image: linear-gradient(135deg, rgba(110, 255, 0, 0.05), rgba(0, 225, 255, 0.03), rgba(255, 221, 0, 0.02));
+}
+
+.game-card:hover {
+  box-shadow: 0 25px 50px -12px rgba(110, 255, 0, 0.4);
+  border-color: rgba(110, 255, 0, 0.6);
+  transform: scale(1.02);
+}
+
+.glass-card {
+  background: rgba(23, 23, 23, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(110, 255, 0, 0.2);
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(110, 255, 0, 0.15);
+  transition: all 0.3s;
+  background-image: linear-gradient(135deg, rgba(110, 255, 0, 0.08), rgba(0, 225, 255, 0.06));
+}
+
+.glass-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(110, 255, 0, 0.25);
+  border-color: rgba(110, 255, 0, 0.4);
+}
+
+.neon-card {
+  background: rgba(23, 23, 23, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 221, 0, 0.4);
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(255, 221, 0, 0.3);
+  transition: all 0.3s;
+  background-image: linear-gradient(135deg, rgba(255, 221, 0, 0.08), rgba(255, 149, 0, 0.05));
+}
+
+.neon-card:hover {
+  box-shadow: 0 25px 50px -12px rgba(255, 221, 0, 0.5);
+  border-color: rgba(255, 221, 0, 0.7);
 }
 
 .game-panel {
-  @apply bg-background-dark/80 backdrop-blur-md border border-accent/50 rounded-xl shadow-lg;
+  background: rgba(23, 23, 23, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 225, 255, 0.3);
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 225, 255, 0.2);
+  background-image: linear-gradient(135deg, rgba(0, 225, 255, 0.05), rgba(0, 163, 255, 0.03));
 }
 
 .game-button {
-  @apply px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-md;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.3s;
+  transform: translateY(0);
+}
+
+.game-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Gradient Text */
 .gradient-text {
-  @apply bg-gradient-to-r from-primary-light to-primary bg-clip-text text-transparent;
+  background: linear-gradient(to right, #aaff00, #6eff00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .gradient-text-secondary {
-  @apply bg-gradient-to-r from-secondary-light to-secondary bg-clip-text text-transparent;
+  background: linear-gradient(to right, #ffdd00, #ffd000);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .gradient-text-tertiary {
-  @apply bg-gradient-to-r from-tertiary-light to-tertiary bg-clip-text text-transparent;
+  background: linear-gradient(to right, #00e1ff, #00a3ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-/* Gradient Buttons */
+/* Enhanced Gradient Buttons */
 .gradient-button-primary {
-  @apply px-6 py-2 bg-gradient-to-r from-primary-light to-primary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-primary/50 transition-all transform hover:scale-105;
+  padding: 0.5rem 1.5rem;
+  background: linear-gradient(to right, #aaff00, #6eff00);
+  color: black;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  box-shadow: 0 0 20px rgba(110, 255, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+  transform: translateY(0);
+}
+
+.gradient-button-primary:hover {
+  box-shadow: 0 0 25px rgba(110, 255, 0, 0.6);
+  transform: scale(1.1);
+  filter: brightness(1.1);
 }
 
 .gradient-button-secondary {
-  @apply px-6 py-2 bg-gradient-to-r from-secondary-light to-secondary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-secondary/50 transition-all transform hover:scale-105;
+  padding: 0.5rem 1.5rem;
+  background: linear-gradient(to right, #ffdd00, #ffd000);
+  color: black;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  box-shadow: 0 0 20px rgba(255, 221, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+  transform: translateY(0);
+}
+
+.gradient-button-secondary:hover {
+  box-shadow: 0 0 25px rgba(255, 221, 0, 0.6);
+  transform: scale(1.1);
+  filter: brightness(1.1);
 }
 
 .gradient-button-tertiary {
-  @apply px-6 py-2 bg-gradient-to-r from-tertiary-light to-tertiary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-tertiary/50 transition-all transform hover:scale-105;
+  padding: 0.5rem 1.5rem;
+  background: linear-gradient(to right, #00e1ff, #00a3ff);
+  color: black;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  box-shadow: 0 0 20px rgba(0, 225, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+  transform: translateY(0);
+}
+
+.gradient-button-tertiary:hover {
+  box-shadow: 0 0 25px rgba(0, 225, 255, 0.6);
+  transform: scale(1.1);
+  filter: brightness(1.1);
+}
+
+/* Neon button styles */
+.btn-neon-primary {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 2px solid #aaff00;
+  color: #aaff00;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(110, 255, 0, 0.5);
+  text-shadow: 0 0 10px rgba(110, 255, 0, 0.8);
+  transition: all 0.3s;
+}
+
+.btn-neon-primary:hover {
+  background: #aaff00;
+  color: black;
+  box-shadow: 0 0 25px rgba(110, 255, 0, 0.8);
+}
+
+.btn-neon-secondary {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 2px solid #ffdd00;
+  color: #ffdd00;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(255, 221, 0, 0.5);
+  text-shadow: 0 0 10px rgba(255, 221, 0, 0.8);
+  transition: all 0.3s;
+}
+
+.btn-neon-secondary:hover {
+  background: #ffdd00;
+  color: black;
+  box-shadow: 0 0 25px rgba(255, 221, 0, 0.8);
+}
+
+.btn-neon-tertiary {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 2px solid #00e1ff;
+  color: #00e1ff;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(0, 225, 255, 0.5);
+  text-shadow: 0 0 10px rgba(0, 225, 255, 0.8);
+  transition: all 0.3s;
+}
+
+.btn-neon-tertiary:hover {
+  background: #00e1ff;
+  color: black;
+  box-shadow: 0 0 25px rgba(0, 225, 255, 0.8);
 }
 
 /* Scrollbar Styling */
@@ -68,14 +227,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: theme('colors.background.dark');
+  background: #171717;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: theme('colors.primary.light');
+  background: #aaff00;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: theme('colors.primary.DEFAULT');
+  background: #6eff00;
 }

@@ -1,7 +1,7 @@
 .App {
   color: #FFFFFF;
   background-color: theme('colors.background.DEFAULT');
-  background-image: linear-gradient(to bottom right, #1a1f2e, #1a1f2e, #111827);
+  background-image: linear-gradient(to bottom right, #151a27, #171c28, #0f1420);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -38,7 +38,8 @@
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  background-image: linear-gradient(to bottom right, rgba(0, 161, 255, 0.03), rgba(110, 255, 0, 0.03));
+  background-image: linear-gradient(to bottom right, rgba(0, 225, 255, 0.05), rgba(110, 255, 0, 0.05), rgba(255, 221, 0, 0.03));
+  animation: backgroundShimmer 15s ease-in-out infinite alternate;
 }
 
 /* Animated transitions */
@@ -60,6 +61,39 @@
 .page-transition-exit-active {
   opacity: 0;
   transition: opacity 300ms;
+}
+
+/* Enhanced animations */
+@keyframes backgroundShimmer {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(110, 255, 0, 0.5)); }
+  50% { filter: drop-shadow(0 0 15px rgba(110, 255, 0, 0.8)); }
+}
+
+@keyframes neonFlicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { text-shadow: 0 0 5px #6eff00, 0 0 10px #6eff00, 0 0 15px #6eff00; }
+  20%, 24%, 55% { text-shadow: none; }
+}
+
+/* Bright text effects */
+.text-glow-primary {
+  text-shadow: 0 0 5px #6eff00, 0 0 10px rgba(110, 255, 0, 0.5);
+}
+
+.text-glow-secondary {
+  text-shadow: 0 0 5px #ffdd00, 0 0 10px rgba(255, 221, 0, 0.5);
+}
+
+.text-glow-tertiary {
+  text-shadow: 0 0 5px #00e1ff, 0 0 10px rgba(0, 225, 255, 0.5);
+}
+
+.text-flicker {
+  animation: neonFlicker 3s infinite alternate;
 }
 
 /* Public layout styling - override margin for public pages */
