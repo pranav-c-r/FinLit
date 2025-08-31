@@ -30,9 +30,8 @@ const MascotDialogue = ({ dialogues, currentDialogueIndex, onDialogueEnd }) => {
         
         // Auto-progress to next dialogue after a delay
         const delayId = setTimeout(() => {
-          if (currentDialogueIndex < dialogues.length - 1) {
-            onDialogueEnd();
-          }
+          // Always call onDialogueEnd - let the parent handle the logic
+          onDialogueEnd();
         }, 3000); // Longer delay before auto-advancing to next dialogue
         return () => clearTimeout(delayId);
       }

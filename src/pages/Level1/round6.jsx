@@ -5,6 +5,8 @@ import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import RoundIntroModal from '../../components/lessons/RoundIntroModal';
 import GuideScreen from '../../components/lessons/GuideScreen';
 import MascotDialogue from '../../components/lessons/MascotDialogue';
+import { useNavigate } from 'react-router-dom';
+import { saveUserProgress as saveProgress } from '../../utils/firebaseUtils';
 
 const Round6 = () => {
   const [showIntro, setShowIntro] = useState(true);
@@ -30,6 +32,7 @@ const Round6 = () => {
   });
 
   const speechSynthesisRef = useRef(window.speechSynthesis);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadVoices = () => {
@@ -176,32 +179,13 @@ const Round6 = () => {
   useEffect(() => {
     if (mascotDialogues.length > 0 && currentDialogueIndex < mascotDialogues.length) {
       playCurrentDialogue();
+    } else if (showSummary) {
+      saveUserProgress();
     }
-  }, [currentDialogueIndex, mascotDialogues]);
+  }, [currentDialogueIndex, mascotDialogues, showSummary]);
 
   const saveUserProgress = async () => {
-    if (!auth.currentUser) return;
-    try {
-      const userProgressRef = doc(database, "Users", auth.currentUser.uid);
-      const userRoundRef = doc(database, "Users", auth.currentUser.uid, "Progress", "Round6");
-  
-      // Check if parent user doc exists
-      const userSnap = await getDoc(userProgressRef);
-  
-      if (userSnap.exists()) {
-        // Update or create Round6 inside Progress subcollection
-        await setDoc(userRoundRef, { ...userChoices }, { merge: true });
-        await updateDoc(userProgressRef, { level: 1, round: 6, round6_completed: true });
-      } else {
-        // If user doc doesn't exist, create it along with Round6 data
-        await setDoc(userProgressRef, { level: 1, round: 6, round6_completed: true });
-        await setDoc(userRoundRef, { ...userChoices });
-      }
-  
-      console.log("Progress saved successfully");
-    } catch (error) {
-      console.error("Error saving progress:", error);
-    }
+    await saveProgress('level1', 'round6', userChoices);
   };
   
 
@@ -581,10 +565,7 @@ const Round6 = () => {
                   <div className="pt-4">
                     <button 
                       className="w-full py-4 bg-gradient-to-r from-[#58cc02] to-[#2fa946] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
-                      onClick={() => {
-                        saveUserProgress();
-                        // window.location.href = '/level1/round7'; // Assuming round 7 or next level exists
-                      }}
+                      onClick={() => navigate('/levels')}
                     >
                       <span>Complete Level 1</span>
                       <span className="text-xl">🎉</span>

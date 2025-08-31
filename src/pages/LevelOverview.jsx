@@ -13,6 +13,8 @@ const LevelOverview = () => {
     { id: 1, title: "Level 1: Age 24-30", rounds: 6, roundTitles: ["Your First Job", "Where Will You Live?", "Wedding & Wallet Drama", "Career Growth vs. Stability", "First Big Asset Purchase", "Parenthood & Future Planning"] },
     { id: 2, title: "Level 2: Age 30-35", rounds: 6, roundTitles: ["The EMI Web", "Side Hustle or Promotion?", "Family Planning & Finances", "Investment Jargon Jungle", "Debt Dragon's Den", "Building a Financial Fortress"] },
     { id: 3, title: "Level 3: Age 36-45", rounds: 5, roundTitles: ["Sandwich Generation Squeeze", "Career Peak or Plateau", "Kids' Education Investment", "Health Reality & Insurance Strategy", "Retirement Acceleration or Lifestyle Upgrade"] },
+    { id: 4, title: "Level 4: Age 45-54", rounds: 6, roundTitles: ["Career Peak or Mid-Life Switch?", "Parents’ Retirement & Your Responsibility", "Mid-Life Crisis or Growth?", "Retirement Planning Countdown", "Health vs Wealth", "The Near-Retirement Dilemma"] },
+    { id: 5, title: "Level 5: Age 54-60", rounds: 6, roundTitles: ["Retirement Fund Dilemma", "Health Scare", "Kids & Big Dreams", "House Decisions", "Late Career Surprise", "Legacy Planning"] },
   ];
 
   useEffect(() => {
@@ -57,6 +59,10 @@ const LevelOverview = () => {
         return userProgress.level1?.round6_completed && (roundNumber <= userProgress[`round${roundNumber}_completed`] || roundNumber === 1); // Level 2 unlocked after Level 1 Round 6
       } else if (levelId === 3) {
         return userProgress.level2?.round6_completed && (roundNumber <= userProgress[`round${roundNumber}_completed`] || roundNumber === 1); // Level 3 unlocked after Level 2 Round 6
+      } else if (levelId === 4) {
+        return userProgress.level3?.round5_completed && (roundNumber <= userProgress[`round${roundNumber}_completed`] || roundNumber === 1); // Level 4 unlocked after Level 3 Round 5
+      } else if (levelId === 5) {
+        return userProgress.level4?.round6_completed && (roundNumber <= userProgress[`round${roundNumber}_completed`] || roundNumber === 1); // Level 5 unlocked after Level 4 Round 6
       }
     }
     return false;
