@@ -1,215 +1,414 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import ChallengeCard from '../components/challenges/ChallengeCard';
-import { challenges } from '../data/mockData';
+import { getChallengesByDifficulty, getChallengesByCategory, getAvailableChallenges } from '../data/challenges';
 
 const Challenges = () => {
-  const { state } = useApp();
-  const { user } = state;
-  const categories = [...new Set(challenges.map(challenge => challenge.category))];
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [view, setView] = useState('grid');
-  const [searchQuery, setSearchQuery] = useState('');
+  const { state, dispatch } = useApp();
+  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedChallenge, setSelectedChallenge] = useState(null);
 
-  // Calculate user progress
-  const completionPercentage = Math.round((user.completedChallenges.length / challenges.length) * 100);
-  const userLevel = Math.floor(user.completedChallenges.length / 5) + 1;
-  const points = user.completedChallenges.length * 100;
-  const nextLevelThreshold = userLevel * 5;
-  const progressToNextLevel = user.completedChallenges.length - ((userLevel - 1) * 5);
+  const handleCompleteChallenge = (challengeId) => {
+    dispatch({
+      type: 'COMPLETE_CHALLENGE',
+      payload: { challengeId }
+    });
+    setSelectedChallenge(null);
+  };
 
-  // Filter challenges based on category and search
-  const filteredChallenges = challenges.filter(challenge => {
-    const matchesCategory = activeCategory === 'All' || challenge.category === activeCategory;
-    const matchesSearch = challenge.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          challenge.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const getFilteredChallenges = () => {
+    let challenges = state.challenges;
 
-  return (
-    <div className="min-h-screen p-4 md:p-8 bg-gradient-to-b from-gray-900 to-gray-800">
-      {/* Header Section */}
-      <div className="mb-8 relative">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
-              Financial Challenges
-            </h1>
-            <p className="text-green-200 mt-2">Level up your financial knowledge through fun challenges</p>
-          </div>
-          
-          {/* User Stats */}
-          <div className="flex gap-4">
-            <div className="bg-gray-800 rounded-xl p-3 shadow-lg border border-green-700/30">
-              <p className="text-green-400 text-sm">Level</p>
-              <p className="text-2xl font-bold text-green-400">{userLevel}</p>
+    // Filter by difficulty
+    if (selectedDifficulty !== 'all') {
+      challenges = challenges.filter(challenge => challenge.difficulty === selectedDifficulty);
+    }
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      challenges = challenges.filter(challenge => challenge.category === selectedCategory);
+    }
+
+    return challenges;
+  };
+
+  const getChallengeStatus = (challenge) => {
+    if (state.user.completedChallenges.includes(challenge.id)) {
+      return 'completed';
+    }
+    
+    const availableChallenges = getAvailableChallenges(state.user);
+    if (availableChallenges.some(c => c.id === challenge.id)) {
+      return 'available';
+    }
+    
+    return 'locked';
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-green-500';
+      case 'available':
+        return 'bg-blue-500';
+      case 'locked':
+        return 'bg-gray-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'completed':
+        return 'Completed';
+      case 'available':
+        return 'Available';
+      case 'locked':
+        return 'Locked';
+      default:
+        return 'Unknown';
+    }
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case 'beginner':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'intermediate':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'advanced':
+        return 'bg-red-500/20 text-red-400 border-red-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    }
+  };
+
+  const renderChallengeCard = (challenge) => {
+    const status = getChallengeStatus(challenge);
+    const isCompleted = status === 'completed';
+    const isAvailable = status === 'available';
+
+    return (
+      <div
+        key={challenge.id}
+        className={`p-6 rounded-lg border transition-all duration-200 cursor-pointer ${
+          isCompleted
+            ? 'border-green-500/50 bg-green-500/10'
+            : isAvailable
+            ? 'border-blue-500/50 bg-blue-500/10 hover:border-blue-400/60'
+            : 'border-accent/30 bg-background-dark/50 opacity-60'
+        }`}
+        onClick={() => isAvailable && setSelectedChallenge(challenge)}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="text-3xl">{challenge.icon}</div>
+            <div>
+              <h3 className="text-xl font-semibold text-white">{challenge.title}</h3>
+              <p className="text-gray-300">{challenge.description}</p>
             </div>
-            <div className="bg-gray-800 rounded-xl p-3 shadow-lg border border-green-700/30">
-              <p className="text-green-400 text-sm">Points</p>
-              <p className="text-2xl font-bold text-green-400">{points}</p>
+          </div>
+          <div className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(status)}`}>
+            {getStatusText(status)}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-400">Category:</span>
+              <span className="text-white capitalize">{challenge.category}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-400">Duration:</span>
+              <span className="text-white">{challenge.duration}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-400">Difficulty:</span>
+              <span className={`px-2 py-1 rounded text-xs border ${getDifficultyColor(challenge.difficulty)}`}>
+                {challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1)}
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <span className="text-yellow-400">⭐</span>
+              <span className="text-white">{challenge.xpReward} XP</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-yellow-400">💰</span>
+              <span className="text-white">{challenge.coinReward} Coins</span>
             </div>
           </div>
         </div>
-        
-        {/* Progress Bar */}
-        <div className="bg-gray-800 rounded-xl p-4 shadow-lg border border-green-700/30">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-green-300 font-medium">Journey to Mastery</span>
-            <span className="text-green-400 font-bold">{completionPercentage}%</span>
-          </div>
-          <div className="w-full bg-gray-700 rounded-full h-3">
-            <div 
-              className="bg-gradient-to-r from-green-500 to-green-700 h-3 rounded-full transition-all duration-700 shadow-md" 
-              style={{ width: `${completionPercentage}%` }}
-            ></div>
-          </div>
-          <div className="flex justify-between mt-2 text-sm text-green-400">
-            <span>{user.completedChallenges.length} completed</span>
-            <span>{challenges.length} total</span>
-          </div>
-        </div>
 
-        {/* Level Progress */}
-        <div className="mt-4 text-center">
-          <p className="text-green-300 text-sm">
-            {progressToNextLevel}/5 challenges to Level {userLevel + 1}
-          </p>
-        </div>
-      </div>
-
-      {/* Search Bar */}
-      <div className="mb-6">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <input
-            type="text"
-            placeholder="Search challenges..."
-            className="bg-gray-800 text-green-200 placeholder-green-400 border border-green-700/30 rounded-xl pl-10 pr-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Categories Section */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-green-400">Challenge Categories</h2>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setView('grid')}
-              className={`p-2 rounded-lg ${view === 'grid' ? 'bg-green-900/50 text-green-400 border border-green-700' : 'bg-gray-800 text-green-300 border border-gray-700'}`}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
-            </button>
-            <button 
-              onClick={() => setView('list')}
-              className={`p-2 rounded-lg ${view === 'list' ? 'bg-green-900/50 text-green-400 border border-green-700' : 'bg-gray-800 text-green-300 border border-gray-700'}`}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        
-        <div className="flex gap-3 overflow-x-auto pb-4">
-          <button
-            onClick={() => setActiveCategory('All')}
-            className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 whitespace-nowrap flex items-center ${
-              activeCategory === 'All'
-                ? 'bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg border border-green-500'
-                : 'bg-gray-800 text-green-300 border border-gray-700 hover:bg-gray-700'
-            }`}
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-            </svg>
-            All Challenges
-          </button>
-          
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 whitespace-nowrap ${
-                activeCategory === category
-                  ? 'bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg border border-green-500'
-                  : 'bg-gray-800 text-green-300 border border-gray-700 hover:bg-gray-700'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Challenges Section */}
-      <div>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-green-400">
-            {activeCategory === 'All' ? 'All Challenges' : activeCategory}
-            <span className="ml-2 text-green-500 bg-green-900/30 px-2 py-1 rounded-full text-sm">
-              {filteredChallenges.length}
-            </span>
-          </h2>
-          
-          <div className="text-green-300 text-sm">
-            Sorted by: <span className="text-green-400 font-medium">Difficulty</span>
-          </div>
-        </div>
-        
-        {filteredChallenges.length === 0 ? (
-          <div className="text-center py-12 bg-gray-800 rounded-2xl border border-green-700/30 shadow-lg">
-            <div className="text-4xl mb-4">🔍</div>
-            <h3 className="text-green-300 text-xl font-medium">No challenges found</h3>
-            <p className="text-green-400/70 mt-2">Try a different search term or category</p>
-          </div>
-        ) : (
-          <div className={view === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "flex flex-col gap-4"}>
-            {filteredChallenges.map((challenge, index) => (
-              <div 
-                key={challenge.id} 
-                className={`transform transition-all duration-300 hover:scale-[1.02] ${
-                  view === 'list' ? 'bg-gray-800 rounded-xl p-4 shadow-lg border border-green-700/30' : ''
-                }`}
-              >
-                <ChallengeCard 
-                  challenge={challenge} 
-                  completed={user.completedChallenges.includes(challenge.id)}
-                  view={view}
-                />
+        {/* Requirements */}
+        <div className="mb-4">
+          <h4 className="text-sm font-medium text-gray-300 mb-2">Requirements:</h4>
+          <div className="space-y-1">
+            {challenge.requirements.map((requirement, index) => (
+              <div key={index} className="flex items-center space-x-2 text-sm">
+                <span className="text-blue-400">•</span>
+                <span className="text-gray-300">{requirement}</span>
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* Achievement Banner */}
-      {user.completedChallenges.length > 0 && user.completedChallenges.length < challenges.length && (
-        <div className="mt-8 bg-gradient-to-r from-green-800 to-green-900 rounded-2xl p-4 text-green-200 text-center shadow-lg border border-green-700/50">
-          <h3 className="font-bold text-lg mb-1">Keep going, Financier!</h3>
-          <p className="text-sm">Complete {nextLevelThreshold - user.completedChallenges.length} more challenges to reach level {userLevel + 1}</p>
-          <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-            <div 
-              className="bg-green-500 h-2 rounded-full" 
-              style={{ width: `${(progressToNextLevel / 5) * 100}%` }}
-            ></div>
+        {/* Tips */}
+        <div className="mb-4">
+          <h4 className="text-sm font-medium text-gray-300 mb-2">Tips:</h4>
+          <div className="space-y-1">
+            {challenge.tips.map((tip, index) => (
+              <div key={index} className="flex items-center space-x-2 text-sm">
+                <span className="text-green-400">💡</span>
+                <span className="text-gray-300">{tip}</span>
+              </div>
+            ))}
           </div>
         </div>
-      )}
 
-      {/* Completed All Banner */}
-      {user.completedChallenges.length === challenges.length && (
-        <div className="mt-8 bg-gradient-to-r from-green-700 to-green-900 rounded-2xl p-4 text-center shadow-lg border border-green-500/50">
-          <h3 className="font-bold text-lg text-green-200 mb-1">🎉 Master Financier! 🎉</h3>
-          <p className="text-green-300 text-sm">You've completed all challenges! Your financial knowledge is impressive!</p>
+        {/* Action Button */}
+        <div className="flex justify-between items-center">
+          {isCompleted ? (
+            <div className="flex items-center space-x-2 text-green-400">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              <span className="font-medium">Completed!</span>
+            </div>
+          ) : isAvailable ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedChallenge(challenge);
+              }}
+              className="bg-primary hover:bg-primary/80 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
+            >
+              Start Challenge
+            </button>
+          ) : (
+            <div className="text-gray-400 text-sm">
+              Complete previous challenges to unlock
+            </div>
+          )}
+
+          {/* Rarity Badge */}
+          {challenge.rarity && (
+            <div className={`px-2 py-1 rounded text-xs font-medium ${
+              challenge.rarity === 'legendary' ? 'bg-yellow-500/20 text-yellow-400' :
+              challenge.rarity === 'epic' ? 'bg-purple-500/20 text-purple-400' :
+              challenge.rarity === 'rare' ? 'bg-blue-500/20 text-blue-400' :
+              'bg-gray-500/20 text-gray-400'
+            }`}>
+              {challenge.rarity.charAt(0).toUpperCase() + challenge.rarity.slice(1)}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderTabContent = () => {
+    const filteredChallenges = getFilteredChallenges();
+    const completedChallenges = filteredChallenges.filter(challenge => 
+      state.user.completedChallenges.includes(challenge.id)
+    );
+    const availableChallenges = filteredChallenges.filter(challenge => 
+      getChallengeStatus(challenge) === 'available'
+    );
+    const lockedChallenges = filteredChallenges.filter(challenge => 
+      getChallengeStatus(challenge) === 'locked'
+    );
+
+    return (
+      <div className="space-y-6">
+        {/* Challenge Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-background-dark/50 p-4 rounded-lg border border-accent/30 text-center">
+            <div className="text-2xl text-green-400 mb-2">✅</div>
+            <div className="text-2xl font-bold text-white">{completedChallenges.length}</div>
+            <div className="text-sm text-gray-300">Completed</div>
+          </div>
+          <div className="bg-background-dark/50 p-4 rounded-lg border border-accent/30 text-center">
+            <div className="text-2xl text-blue-400 mb-2">🏆</div>
+            <div className="text-2xl font-bold text-white">{availableChallenges.length}</div>
+            <div className="text-sm text-gray-300">Available</div>
+          </div>
+          <div className="bg-background-dark/50 p-4 rounded-lg border border-accent/30 text-center">
+            <div className="text-2xl text-gray-400 mb-2">🔒</div>
+            <div className="text-2xl font-bold text-white">{lockedChallenges.length}</div>
+            <div className="text-sm text-gray-300">Locked</div>
+          </div>
+        </div>
+
+        {/* Challenges List */}
+        <div className="space-y-4">
+          {filteredChallenges.length > 0 ? (
+            filteredChallenges.map(renderChallengeCard)
+          ) : (
+            <div className="text-center py-8 text-gray-400">
+              <div className="text-4xl mb-4">🏆</div>
+              <p>No challenges available with the selected filters</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-4xl font-bold gradient-text mb-2">Financial Challenges</h1>
+        <p className="text-gray-300">Test your financial knowledge and earn rewards</p>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-background-dark/50 p-4 rounded-lg border border-accent/30">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Difficulty Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Difficulty</label>
+            <select
+              value={selectedDifficulty}
+              onChange={(e) => setSelectedDifficulty(e.target.value)}
+              className="w-full bg-background-dark border border-accent/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="all">All Difficulties</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+
+          {/* Category Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full bg-background-dark border border-accent/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="all">All Categories</option>
+              <option value="spending">Spending</option>
+              <option value="budgeting">Budgeting</option>
+              <option value="saving">Saving</option>
+              <option value="debt">Debt</option>
+              <option value="investing">Investing</option>
+              <option value="tracking">Tracking</option>
+              <option value="planning">Planning</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      {renderTabContent()}
+
+      {/* Challenge Benefits */}
+      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl border border-primary/20 p-6">
+        <h3 className="text-xl font-bold gradient-text mb-4">Why Take Financial Challenges?</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="text-2xl">🎯</div>
+            <div>
+              <h4 className="font-semibold text-white">Test Knowledge</h4>
+              <p className="text-sm text-gray-300">Apply what you've learned in real-world scenarios</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className="text-2xl">💰</div>
+            <div>
+              <h4 className="font-semibold text-white">Earn Rewards</h4>
+              <p className="text-sm text-gray-300">Get XP, coins, and unlock exclusive items</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className="text-2xl">📈</div>
+            <div>
+              <h4 className="font-semibold text-white">Track Progress</h4>
+              <p className="text-sm text-gray-300">Monitor your financial learning journey</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className="text-2xl">🏆</div>
+            <div>
+              <h4 className="font-semibold text-white">Build Confidence</h4>
+              <p className="text-sm text-gray-300">Gain confidence in your financial decision-making</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Challenge Modal */}
+      {selectedChallenge && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-background-dark rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-white">{selectedChallenge.title}</h2>
+                <button
+                  onClick={() => setSelectedChallenge(null)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-gray-300">{selectedChallenge.description}</p>
+                
+                <div className="bg-background-light/20 p-4 rounded-lg">
+                  <h3 className="font-semibold text-white mb-2">Requirements:</h3>
+                  <ul className="space-y-1">
+                    {selectedChallenge.requirements.map((req, index) => (
+                      <li key={index} className="flex items-center space-x-2 text-sm text-gray-300">
+                        <span className="text-blue-400">•</span>
+                        <span>{req}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="bg-background-light/20 p-4 rounded-lg">
+                  <h3 className="font-semibold text-white mb-2">Tips:</h3>
+                  <ul className="space-y-1">
+                    {selectedChallenge.tips.map((tip, index) => (
+                      <li key={index} className="flex items-center space-x-2 text-sm text-gray-300">
+                        <span className="text-green-400">💡</span>
+                        <span>{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-background-light/20 rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-yellow-400">⭐</span>
+                      <span className="text-white font-medium">{selectedChallenge.xpReward} XP</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-yellow-400">💰</span>
+                      <span className="text-white font-medium">{selectedChallenge.coinReward} Coins</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleCompleteChallenge(selectedChallenge.id)}
+                    className="bg-primary hover:bg-primary/80 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
+                  >
+                    Complete Challenge
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

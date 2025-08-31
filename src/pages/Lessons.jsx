@@ -1,199 +1,339 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import LessonCard from '../components/lessons/LessonCard';
-import { lessons } from '../data/mockData';
+import { getLessonsByDifficulty, getLessonsByCategory, getAvailableLessons } from '../data/lessons';
 
 const Lessons = () => {
-  const { state } = useApp();
-  const { user } = state;
-  const categories = [...new Set(lessons.map(lesson => lesson.category))];
-  const categoryRefs = useRef([]);
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [filteredLessons, setFilteredLessons] = useState(lessons);
+  const { state, dispatch } = useApp();
+  const [activeTab, setActiveTab] = useState('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
-  useEffect(() => {
-    categoryRefs.current.forEach((ref, index) => {
-      if (ref) {
-        setTimeout(() => {
-          ref.classList.remove('opacity-0', 'scale-90');
-          ref.classList.add('opacity-100', 'scale-100');
-        }, index * 150);
-      }
+  const handleCompleteLesson = (lessonId) => {
+    dispatch({
+      type: 'COMPLETE_LESSON',
+      payload: { lessonId }
     });
-  }, []);
-
-  useEffect(() => {
-    if (activeCategory === 'All') {
-      setFilteredLessons(lessons);
-    } else {
-      setFilteredLessons(lessons.filter(lesson => lesson.category === activeCategory));
-    }
-  }, [activeCategory]);
-
-  const getCategoryIcon = (category) => {
-    const icons = {
-      'Budgeting': '💰',
-      'Investing': '📈',
-      'Saving': '🏦',
-      'Credit': '💳',
-      'Debt': '📉',
-      'Retirement': '👵',
-      'Taxes': '🧾',
-      'Insurance': '🛡️'
-    };
-    return icons[category] || '📚';
   };
 
-  const getProgressPercentage = () => {
-    const completed = user.completedLessons.length;
-    const total = lessons.length;
-    return Math.round((completed / total) * 100);
+  const getFilteredLessons = () => {
+    let lessons = state.lessons;
+
+    // Filter by difficulty
+    if (selectedDifficulty !== 'all') {
+      lessons = lessons.filter(lesson => lesson.difficulty === selectedDifficulty);
+    }
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      lessons = lessons.filter(lesson => lesson.category === selectedCategory);
+    }
+
+    return lessons;
+  };
+
+  const getLessonStatus = (lesson) => {
+    if (state.user.completedLessons.includes(lesson.id)) {
+      return 'completed';
+    }
+    
+    const availableLessons = getAvailableLessons(state.user);
+    if (availableLessons.some(l => l.id === lesson.id)) {
+      return 'available';
+    }
+    
+    return 'locked';
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-green-500';
+      case 'available':
+        return 'bg-blue-500';
+      case 'locked':
+        return 'bg-gray-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'completed':
+        return 'Completed';
+      case 'available':
+        return 'Available';
+      case 'locked':
+        return 'Locked';
+      default:
+        return 'Unknown';
+    }
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case 'beginner':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'intermediate':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'advanced':
+        return 'bg-red-500/20 text-red-400 border-red-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    }
+  };
+
+  const renderLessonCard = (lesson) => {
+    const status = getLessonStatus(lesson);
+    const isCompleted = status === 'completed';
+    const isAvailable = status === 'available';
+
+    return (
+      <div
+        key={lesson.id}
+        className={`p-6 rounded-lg border transition-all duration-200 ${
+          isCompleted
+            ? 'border-green-500/50 bg-green-500/10'
+            : isAvailable
+            ? 'border-blue-500/50 bg-blue-500/10'
+            : 'border-accent/30 bg-background-dark/50 opacity-60'
+        }`}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="text-3xl">{lesson.icon}</div>
+            <div>
+              <h3 className="text-xl font-semibold text-white">{lesson.title}</h3>
+              <p className="text-gray-300">{lesson.description}</p>
+            </div>
+          </div>
+          <div className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(status)}`}>
+            {getStatusText(status)}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-400">Category:</span>
+              <span className="text-white capitalize">{lesson.category}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-400">Duration:</span>
+              <span className="text-white">{lesson.duration}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-400">Difficulty:</span>
+              <span className={`px-2 py-1 rounded text-xs border ${getDifficultyColor(lesson.difficulty)}`}>
+                {lesson.difficulty.charAt(0).toUpperCase() + lesson.difficulty.slice(1)}
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <span className="text-yellow-400">⭐</span>
+              <span className="text-white">{lesson.xpReward} XP</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-yellow-400">💰</span>
+              <span className="text-white">{lesson.coinReward} Coins</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Topics */}
+        <div className="mb-4">
+          <h4 className="text-sm font-medium text-gray-300 mb-2">What you'll learn:</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {lesson.topics.map((topic, index) => (
+              <div key={index} className="flex items-center space-x-2 text-sm">
+                <span className="text-green-400">✓</span>
+                <span className="text-gray-300">{topic}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <div className="flex justify-between items-center">
+          {isCompleted ? (
+            <div className="flex items-center space-x-2 text-green-400">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              <span className="font-medium">Completed!</span>
+            </div>
+          ) : isAvailable ? (
+            <button
+              onClick={() => handleCompleteLesson(lesson.id)}
+              className="bg-primary hover:bg-primary/80 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
+            >
+              Start Lesson
+            </button>
+          ) : (
+            <div className="text-gray-400 text-sm">
+              Complete previous lessons to unlock
+            </div>
+          )}
+
+          {/* Quiz Info */}
+          {lesson.quiz && (
+            <div className="text-sm text-gray-400">
+              {lesson.quiz.length} questions
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderTabContent = () => {
+    const filteredLessons = getFilteredLessons();
+    const completedLessons = filteredLessons.filter(lesson => 
+      state.user.completedLessons.includes(lesson.id)
+    );
+    const availableLessons = filteredLessons.filter(lesson => 
+      getLessonStatus(lesson) === 'available'
+    );
+    const lockedLessons = filteredLessons.filter(lesson => 
+      getLessonStatus(lesson) === 'locked'
+    );
+
+    return (
+      <div className="space-y-6">
+        {/* Lesson Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-background-dark/50 p-4 rounded-lg border border-accent/30 text-center">
+            <div className="text-2xl text-green-400 mb-2">✅</div>
+            <div className="text-2xl font-bold text-white">{completedLessons.length}</div>
+            <div className="text-sm text-gray-300">Completed</div>
+          </div>
+          <div className="bg-background-dark/50 p-4 rounded-lg border border-accent/30 text-center">
+            <div className="text-2xl text-blue-400 mb-2">📚</div>
+            <div className="text-2xl font-bold text-white">{availableLessons.length}</div>
+            <div className="text-sm text-gray-300">Available</div>
+          </div>
+          <div className="bg-background-dark/50 p-4 rounded-lg border border-accent/30 text-center">
+            <div className="text-2xl text-gray-400 mb-2">🔒</div>
+            <div className="text-2xl font-bold text-white">{lockedLessons.length}</div>
+            <div className="text-sm text-gray-300">Locked</div>
+          </div>
+        </div>
+
+        {/* Lessons List */}
+        <div className="space-y-4">
+          {filteredLessons.length > 0 ? (
+            filteredLessons.map(renderLessonCard)
+          ) : (
+            <div className="text-center py-8 text-gray-400">
+              <div className="text-4xl mb-4">📚</div>
+              <p>No lessons available with the selected filters</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 relative overflow-hidden bg-background-dark">
-      {/* Header Section */}
-      <div className="relative z-10 mb-10 text-center">
-        <div className="inline-block bg-gradient-to-r from-primary-light to-primary p-1 rounded-full mb-4">
-          <div className="bg-gray-800 rounded-full p-3">
-            <span className="text-2xl">🎓</span>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-4xl font-bold gradient-text mb-2">Financial Lessons</h1>
+        <p className="text-gray-300">Learn essential financial concepts and earn rewards</p>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-background-dark/50 p-4 rounded-lg border border-accent/30">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Difficulty Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Difficulty</label>
+            <select
+              value={selectedDifficulty}
+              onChange={(e) => setSelectedDifficulty(e.target.value)}
+              className="w-full bg-background-dark border border-accent/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="all">All Difficulties</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
           </div>
-        </div>
-        <h1 className="text-4xl md:text-5xl font-bold gradient-text-secondary">
-          Financial Adventure
-        </h1>
-        <p className="text-gray-300 mt-3 max-w-2xl mx-auto">
-          Embark on a journey to master your finances. Complete lessons, earn badges, and level up your financial knowledge!
-        </p>
-        
-        {/* Progress Bar */}
-        <div className="mt-8 max-w-2xl mx-auto">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-300">Your Progress</span>
-            <span className="text-sm font-bold text-primary-light">{getProgressPercentage()}% Complete</span>
+
+          {/* Category Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full bg-background-dark border border-accent/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="all">All Categories</option>
+              <option value="budgeting">Budgeting</option>
+              <option value="saving">Saving</option>
+              <option value="debt">Debt</option>
+              <option value="investing">Investing</option>
+              <option value="retirement">Retirement</option>
+              <option value="taxes">Taxes</option>
+              <option value="planning">Planning</option>
+            </select>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-4">
-            <div 
-              className="bg-gradient-to-r from-primary-light to-primary h-4 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${getProgressPercentage()}%` }}
-            ></div>
-          </div>
-          <div className="flex justify-between mt-2">
-            <span className="text-xs text-gray-400">{user.completedLessons.length} lessons completed</span>
-            <span className="text-xs text-gray-400">{lessons.length - user.completedLessons.length} to go</span>
+
+          {/* Progress Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Progress</label>
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value)}
+              className="w-full bg-background-dark border border-accent/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="all">All Lessons</option>
+              <option value="completed">Completed</option>
+              <option value="available">Available</option>
+              <option value="locked">Locked</option>
+            </select>
           </div>
         </div>
       </div>
 
-      {/* Categories Navigation */}
-      <div className="mb-10 relative z-10">
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">Choose Your Path</h2>
-        <div className="flex flex-wrap justify-center gap-3">
-          <button
-            onClick={() => setActiveCategory('All')}
-            className={`px-5 py-3 rounded-full font-medium transition-all duration-300 flex items-center ${
-              activeCategory === 'All' 
-                ? 'bg-gradient-to-r from-primary-light to-primary text-white shadow-lg transform -translate-y-1' 
-                : 'bg-gray-800 text-gray-300 shadow-md hover:bg-gray-700'
-            }`}
-          >
-            <span className="mr-2">🌠</span> All Topics
-          </button>
-          
-          {categories.map((category, index) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              ref={el => categoryRefs.current[index] = el}
-              className={`px-5 py-3 rounded-full font-medium transition-all duration-300 flex items-center ${
-                activeCategory === category 
-                  ? 'bg-gradient-to-r from-primary-light to-primary text-white shadow-lg transform -translate-y-1' 
-                  : 'bg-gray-800 text-gray-300 shadow-md hover:bg-gray-700'
-              }`}
-            >
-              <span className="mr-2">{getCategoryIcon(category)}</span> {category}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Tab Content */}
+      {renderTabContent()}
 
-      {/* Lessons Grid */}
-      <div className="relative z-10">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">
-            {activeCategory === 'All' ? 'All Quests' : activeCategory + ' Quests'}
-          </h2>
-          <div className="flex items-center bg-gray-800 py-1 px-3 rounded-full shadow-sm">
-            <span className="text-yellow-500 mr-1">⭐</span>
-            <span className="text-sm font-medium text-gray-300">{filteredLessons.length} lessons</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredLessons.map((lesson, index) => (
-            <div 
-              key={lesson.id} 
-              className="transform transition-all duration-500 hover:scale-105"
-              style={{ animationDelay: `${index * 150}ms` }}
-            >
-              <div className={`relative rounded-2xl overflow-hidden game-card ${
-                user.completedLessons.includes(lesson.id) 
-                  ? 'border-2 border-green-500' 
-                  : 'border-2 border-transparent'
-              }`}>
-                {/* Lesson Header with Gradient */}
-                <div className="h-4 bg-gradient-to-r from-primary-light to-primary"></div>
-                
-                <div className="p-6 bg-gray-800">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl ${
-                      user.completedLessons.includes(lesson.id) 
-                        ? 'bg-green-900 text-green-400' 
-                        : 'bg-gray-700 text-primary-light'
-                    }`}>
-                      {user.completedLessons.includes(lesson.id) ? '✓' : lesson.emoji}
-                    </div>
-                    <span className="text-xs font-semibold px-2 py-1 rounded-full bg-gray-700 text-gray-300">
-                      {lesson.difficulty}
-                    </span>
-                  </div>
-                  
-                  <h3 className="text-xl font-bold text-white mb-2">{lesson.title}</h3>
-                  <p className="text-gray-300 text-sm mb-4">{lesson.description}</p>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <span className="text-xs text-gray-400 mr-2">⏱️</span>
-                      <span className="text-xs text-gray-400">{lesson.duration} min</span>
-                    </div>
-                    
-                    <button className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      user.completedLessons.includes(lesson.id)
-                        ? 'bg-green-900 text-green-300'
-                        : 'bg-gradient-to-r from-primary-light to-primary text-white hover:shadow-md'
-                    }`}>
-                      {user.completedLessons.includes(lesson.id) ? 'Completed' : 'Start Quest'}
-                    </button>
-                  </div>
-                </div>
-                
-                {/* XP Badge */}
-                <div className="absolute top-3 right-3 bg-yellow-900 text-yellow-300 text-xs font-bold px-2 py-1 rounded-full">
-                  +{lesson.xp} XP
-                </div>
-              </div>
+      {/* Learning Benefits */}
+      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl border border-primary/20 p-6">
+        <h3 className="text-xl font-bold gradient-text mb-4">Why Learn Financial Literacy?</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="text-2xl">💰</div>
+            <div>
+              <h4 className="font-semibold text-white">Build Wealth</h4>
+              <p className="text-sm text-gray-300">Learn strategies to save, invest, and grow your money</p>
             </div>
-          ))}
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className="text-2xl">🛡️</div>
+            <div>
+              <h4 className="font-semibold text-white">Financial Security</h4>
+              <p className="text-sm text-gray-300">Create emergency funds and protect against financial risks</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className="text-2xl">🎯</div>
+            <div>
+              <h4 className="font-semibold text-white">Achieve Goals</h4>
+              <p className="text-sm text-gray-300">Plan and reach your financial objectives</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className="text-2xl">🚀</div>
+            <div>
+              <h4 className="font-semibold text-white">Future Planning</h4>
+              <p className="text-sm text-gray-300">Prepare for retirement and long-term financial success</p>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Achievement Callout */}
-      <div className="mt-12 bg-gradient-to-r from-primary-light to-primary rounded-2xl p-6 text-center text-white shadow-xl">
-        <h3 className="text-2xl font-bold mb-2">Unlock Achievements!</h3>
-        <p className="mb-4">Complete lessons to earn badges and climb the leaderboard.</p>
-        <button className="bg-gray-800 text-white font-semibold px-6 py-2 rounded-full hover:bg-gray-700 transition">
-          View Achievements
-        </button>
       </div>
     </div>
   );
