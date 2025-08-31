@@ -18,19 +18,22 @@ import DailyQuests from './components/quests/DailyQuests';
 import Rewards from './pages/Rewards';
 import Social from './pages/Social';
 import Achievements from './pages/Achievements';
-import LevelOverview from './pages/LevelOverview'; // Import the new LevelOverview component
+import LevelOverview from './pages/LevelOverview';
 
 import './App.css';
 import './styles/globals.css';
 import SignIn from './pages/signIn';
+
+// Level 1 imports
 import Round1 from './pages/Level1/round1';
 import Round2 from './pages/Level1/round2';
 import Round3 from './pages/Level1/round3';
 import Round4 from './pages/Level1/round4';
 import Round5 from './pages/Level1/round5';
 import Round6 from './pages/Level1/round6';
-import Level1Overview from './pages/Level1'; // This will be the new index.jsx for Level 1
+import Level1Overview from './pages/Level1';
 
+// Level 2 imports
 import Round1Level2 from './pages/Level2/round1';
 import Round2Level2 from './pages/Level2/round2';
 import Round3Level2 from './pages/Level2/round3';
@@ -39,28 +42,32 @@ import Round5Level2 from './pages/Level2/round5';
 import Round6Level2 from './pages/Level2/round6';
 import Level2Overview from './pages/Level2';
 
-import Round1Level3 from './pages/Level3/round1'; // Import Level 3 rounds
+// Level 3 imports
+import Round1Level3 from './pages/Level3/round1';
 import Round2Level3 from './pages/Level3/round2';
 import Round3Level3 from './pages/Level3/round3';
 import Round4Level3 from './pages/Level3/round4';
 import Round5Level3 from './pages/Level3/round5';
 import Level3Overview from './pages/Level3';
 
-import Round1Level4 from './pages/Level4/round1'; // Import Level 4 rounds
+// Level 4 imports
+import Round1Level4 from './pages/Level4/round1';
 import Round2Level4 from './pages/Level4/round2';
 import Round3Level4 from './pages/Level4/round3';
 import Round4Level4 from './pages/Level4/round4';
 import Round5Level4 from './pages/Level4/round5';
 import Round6Level4 from './pages/Level4/round6';
-import Level4Overview from './pages/Level4';
+import Level4Overview from './pages/Level4'; // Make sure this component exists
 
-import Round1Level5 from './pages/Level5/round1'; // Import Level 5 rounds
+// Level 5 imports
+import Round1Level5 from './pages/Level5/round1';
 import Round2Level5 from './pages/Level5/round2';
 import Round3Level5 from './pages/Level5/round3';
 import Round4Level5 from './pages/Level5/round4';
 import Round5Level5 from './pages/Level5/round5';
 import Round6Level5 from './pages/Level5/round6';
-import Level5Overview from './pages/Level5';
+import Level5Overview from './pages/Level5'; // Make sure this component exists
+
 // Game UI Background
 const GameBackground = () => {
   return (
@@ -83,19 +90,17 @@ const AuthenticatedLayout = ({ children, isSidebarOpen, toggleSidebar }) => {
         </main>
         <Footer />
       </div>
-      {/* <Navigation /> Removed bottom navigation bar */}
     </div>
   );
 };
 
 // Create a layout for public routes (no sidebar/navigation)
-// Create a layout for public routes (no sidebar/navigation)
 const PublicLayout = ({ children, path }) => {
   return (
-    <div className="App public-layout-container"> {/* Added public-layout-container class */}
+    <div className="App public-layout-container">
       <GameBackground />
       <div className="app-content">
-        <main className="main-content public-layout landing-page"> {/* Added landing-page class */}
+        <main className="main-content public-layout landing-page">
           {children}
         </main>
         {/* Don't include Footer on Landing page as it has its own footer */}
@@ -111,25 +116,28 @@ function App() {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+  
   return (
     <AppProvider>
       <Router>
         <Routes>
           {/* Redirect from root to landing page */}
-          <Route path="/" element={
-            <Navigate to="/landing" replace />
-          } />
+          <Route path="/" element={<Navigate to="/landing" replace />} />
+          
           <Route path="/landing" element={
             <PublicLayout path="/landing">
               <Landing />
             </PublicLayout>
           } />
-          <Route path="/levels" element={ // New route for the LevelOverview page
+          
+          <Route path="/levels" element={
             <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <LevelOverview />
             </AuthenticatedLayout>
           } />
-          <Route path="/level1" element={ // Redirect from /level1 to LevelOverview, as it's now handled there
+          
+          {/* Level 1 Routes */}
+          <Route path="/level1" element={
             <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Level1Overview />
             </AuthenticatedLayout>
@@ -234,7 +242,7 @@ function App() {
             </AuthenticatedLayout>
           } />
 
-          {/* Level 4 Routes */}
+          {/* Level 4 Routes - Updated to match pattern */}
           <Route path="/level4" element={
             <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Level4Overview />
@@ -271,7 +279,7 @@ function App() {
             </AuthenticatedLayout>
           } />
 
-          {/* Level 5 Routes */}
+          {/* Level 5 Routes - Updated to match pattern */}
           <Route path="/level5" element={
             <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Level5Overview />
@@ -314,7 +322,7 @@ function App() {
             </PublicLayout>
           } />
 
-          {/* Authenticated routes with sidebar/navigation */}
+          {/* Other authenticated routes */}
           <Route path="/home" element={
             <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Home />
