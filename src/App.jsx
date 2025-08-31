@@ -18,6 +18,7 @@ import DailyQuests from './components/quests/DailyQuests';
 import Rewards from './pages/Rewards';
 import Social from './pages/Social';
 import Achievements from './pages/Achievements';
+import LevelOverview from './pages/LevelOverview'; // Import the new LevelOverview component
 
 import './App.css';
 import './styles/globals.css';
@@ -37,6 +38,13 @@ import Round4Level2 from './pages/Level2/round4';
 import Round5Level2 from './pages/Level2/round5';
 import Round6Level2 from './pages/Level2/round6';
 import Level2Overview from './pages/Level2';
+
+import Round1Level3 from './pages/Level3/round1'; // Import Level 3 rounds
+import Round2Level3 from './pages/Level3/round2';
+import Round3Level3 from './pages/Level3/round3';
+import Round4Level3 from './pages/Level3/round4';
+import Round5Level3 from './pages/Level3/round5';
+import Level3Overview from './pages/Level3';
 
 // Game UI Background
 const GameBackground = () => {
@@ -96,7 +104,12 @@ function App() {
               <Landing />
             </PublicLayout>
           } />
-          <Route path="/level1" element={
+          <Route path="/levels" element={ // New route for the LevelOverview page
+            <AuthenticatedLayout>
+              <LevelOverview />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level1" element={ // Redirect from /level1 to LevelOverview, as it's now handled there
             <AuthenticatedLayout>
               <Level1Overview />
             </AuthenticatedLayout>
@@ -166,6 +179,38 @@ function App() {
           <Route path="/level2/round6" element={
             <AuthenticatedLayout>
               <Round6Level2 />
+            </AuthenticatedLayout>
+          } />
+
+          {/* Level 3 Routes */}
+          <Route path="/level3" element={
+            <AuthenticatedLayout>
+              <Level3Overview />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level3/round1" element={
+            <AuthenticatedLayout>
+              <Round1Level3 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level3/round2" element={
+            <AuthenticatedLayout>
+              <Round2Level3 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level3/round3" element={
+            <AuthenticatedLayout>
+              <Round3Level3 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level3/round4" element={
+            <AuthenticatedLayout>
+              <Round4Level3 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level3/round5" element={
+            <AuthenticatedLayout>
+              <Round5Level3 />
             </AuthenticatedLayout>
           } />
 
