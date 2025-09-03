@@ -11,8 +11,19 @@ const initialState = {
     coins: 1000,
     completedLessons: [],
     completedChallenges: [],
-    goals: []
+    goals: [],
+    avatar: '👤',
+    banner: 'default',
+    theme: 'default',
+    titles: ['Beginner'],
+    activeTitle: 'Beginner',
+    streak: 0,
+    lastLogin: null,
+    friends: []
   },
+  piggyBank: null,
+  dailyQuests: [],
+  expenses: [],
   theme: 'dark'
 };
 
@@ -63,6 +74,120 @@ function appReducer(state, action) {
           ...state.user,
           level: state.user.level + 1,
           nextLevelXp: state.user.nextLevelXp * 2
+        }
+      };
+    // Piggy Bank Actions
+    case 'INIT_PIGGY_BANK':
+      return {
+        ...state,
+        piggyBank: action.payload
+      };
+    case 'DEPOSIT_TO_PIGGY_BANK':
+      const newBalance = (state.piggyBank?.balance || 0) + action.payload.amount;
+      return {
+        ...state,
+        piggyBank: {
+          ...state.piggyBank,
+          balance: newBalance,
+          lastDeposit: action.payload.date,
+          history: [
+            {
+              type: 'deposit',
+              amount: action.payload.amount,
+              date: action.payload.date
+            },
+            ...(state.piggyBank?.history || [])
+          ]
+        }
+      };
+    case 'BREAK_PIGGY_BANK':
+      const withdrawnAmount = state.piggyBank?.balance || 0;
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          coins: state.user.coins + withdrawnAmount
+        },
+        piggyBank: {
+          balance: 0,
+          lastDeposit: null,
+          history: [
+            {
+              type: 'withdraw',
+              amount: withdrawnAmount,
+              date: action.payload.date
+            },
+            ...(state.piggyBank?.history || [])
+          ]
+        }
+      };
+    // Daily Quests Actions
+    case 'INIT_DAILY_QUESTS':
+      return {
+        ...state,
+        dailyQuests: action.payload
+      };
+    case 'COMPLETE_DAILY_QUEST':
+      return {
+        ...state,
+        dailyQuests: state.dailyQuests.map(quest => 
+          quest.id === action.payload.questId ? { ...quest, completed: true } : quest
+        ),
+        user: {
+          ...state.user,
+          xp: state.user.xp + action.payload.xp,
+          coins: state.user.coins + action.payload.coins
+        }
+      };
+    // Expense Tracker Actions
+    case 'ADD_EXPENSE':
+      return {
+        ...state,
+        expenses: [...state.expenses, action.payload]
+      };
+    case 'UPDATE_EXPENSE':
+      return {
+        ...state,
+        expenses: state.expenses.map(expense => 
+          expense.id === action.payload.id ? action.payload : expense
+        )
+      };
+    case 'DELETE_EXPENSE':
+      return {
+        ...state,
+        expenses: state.expenses.filter(expense => expense.id !== action.payload.id)
+      };
+    // Profile & Rewards Actions
+    case 'UPDATE_PROFILE':
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          ...action.payload
+        }
+      };
+    case 'UNLOCK_TITLE':
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          titles: [...state.user.titles, action.payload.title]
+        }
+      };
+    case 'SET_ACTIVE_TITLE':
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          activeTitle: action.payload.title
+        }
+      };
+    case 'ADD_FRIEND':
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          friends: [...state.user.friends, action.payload.friend]
         }
       };
     default:

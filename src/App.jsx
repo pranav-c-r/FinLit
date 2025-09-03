@@ -12,6 +12,12 @@ import Challenges from './pages/Challenges';
 import Goals from './pages/Goals';
 import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
+import PiggyBank from './pages/PiggyBank';
+import DailyQuests from './pages/DailyQuests';
+import ExpenseTracker from './pages/ExpenseTracker';
+import Rewards from './pages/Rewards';
+import Social from './pages/Social';
+import Achievements from './pages/Achievements';
 
 import './App.css';
 import './styles/globals.css';
@@ -19,13 +25,11 @@ import SignIn from './pages/signIn';
 import Level11 from './pages/Level1/round1';
 import Level12 from './pages/Level1/round2';
 
-// Animated Background Component
-const AnimatedBackground = () => {
+// Game UI Background
+const GameBackground = () => {
   return (
     <div className="app-background">
-      <div className="bg-blob-1" />
-      <div className="bg-blob-2" />
-      <div className="bg-blob-3" />
+      {/* Clean background without any elements */}
     </div>
   );
 };
@@ -33,12 +37,12 @@ const AnimatedBackground = () => {
 // Create a layout component for authenticated routes
 const AuthenticatedLayout = ({ children }) => {
   return (
-    <div className="App font-poppins">
-      <AnimatedBackground />
+    <div className="App">
+      <GameBackground />
       <Sidebar />
       <div className="app-content">
         <Header />
-        <main className="main-content">
+        <main className="main-content mx-4 my-4 p-4">
           {children}
         </main>
         <Footer />
@@ -51,13 +55,15 @@ const AuthenticatedLayout = ({ children }) => {
 // Create a layout for public routes (no sidebar/navigation)
 const PublicLayout = ({ children, path }) => {
   return (
-    <div className="App font-poppins">
-      <AnimatedBackground />
-      <main className="main-content public-layout">
-        {children}
-      </main>
-      {/* Don't include Footer on Landing page as it has its own footer */}
-      {path !== '/' && <Footer />}
+    <div className="App">
+      <GameBackground />
+      <div className="app-content">
+        <main className="main-content public-layout">
+          {children}
+        </main>
+        {/* Don't include Footer on Landing page as it has its own footer */}
+        {path !== '/' && <Footer />}
+      </div>
     </div>
   );
 };
@@ -118,6 +124,36 @@ function App() {
           <Route path="/profile" element={
             <AuthenticatedLayout>
               <Profile />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/piggybank" element={
+            <AuthenticatedLayout>
+              <PiggyBank />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/daily-quests" element={
+            <AuthenticatedLayout>
+              <DailyQuests />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/expenses" element={
+            <AuthenticatedLayout>
+              <ExpenseTracker />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/rewards" element={
+            <AuthenticatedLayout>
+              <Rewards />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/social" element={
+            <AuthenticatedLayout>
+              <Social />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/achievements" element={
+            <AuthenticatedLayout>
+              <Achievements />
             </AuthenticatedLayout>
           } />
         </Routes>

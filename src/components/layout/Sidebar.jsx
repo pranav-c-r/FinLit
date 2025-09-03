@@ -9,6 +9,12 @@ const Sidebar = () => {
     { path: '/lessons', icon: '📚', label: 'Lessons' },
     { path: '/challenges', icon: '🎯', label: 'Challenges' },
     { path: '/goals', icon: '🎯', label: 'Goals' },
+    { path: '/piggybank', icon: '🐷', label: 'Piggy Bank' },
+    { path: '/daily-quests', icon: '✨', label: 'Daily Quests' },
+    { path: '/expenses', icon: '💰', label: 'Expenses' },
+    { path: '/rewards', icon: '🎁', label: 'Rewards' },
+    { path: '/achievements', icon: '🏅', label: 'Achievements' },
+    { path: '/social', icon: '👥', label: 'Social' },
     { path: '/leaderboard', icon: '🏆', label: 'Leaderboard' },
     { path: '/profile', icon: '👤', label: 'Profile' },
   ];

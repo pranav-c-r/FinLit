@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-background-dark/90 backdrop-blur-md border-t border-accent/30 py-8 relative overflow-hidden">
+    <footer className="bg-background-dark/90 backdrop-blur-md border-t border-accent/30 py-6 mt-auto w-full relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute w-64 h-64 bg-primary-light/30 rounded-full blur-3xl -bottom-32 -left-32 animate-pulse-slow" />
