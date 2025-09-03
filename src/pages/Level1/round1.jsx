@@ -393,7 +393,19 @@ const Round1 = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a1f2e] to-[#111827] text-white overflow-hidden">
       {/* Show intro modal first */}
-      {showIntro && <RoundIntroModal onClose={handleStartJourney} />}
+      {showIntro && (
+        <RoundIntroModal 
+          onButtonClick={handleStartJourney}
+          roundNumber={1}
+          title="Round 1: First Job & Salary"
+          description="In this round, you'll discover how your first job choice shapes your entire financial future. Every decision has trade-offs — stability vs. growth, immediate money vs. long-term potential."
+          challenges={[
+            "Choose your first job (risk/reward trade-offs)",
+            "Decide what to do with your first salary",
+            "Handle an unexpected financial situation"
+          ]}
+        />
+      )}
       
       {/* Show guide screen after modal closes */}
       {showGuide && <GuideScreen onNext={handleContinue} />}

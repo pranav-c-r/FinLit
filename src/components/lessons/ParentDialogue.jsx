@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import TalkingMascot from './TalkingMascot';
-import videoSrc from '../../assets/oldman.mp4'
+import defaultVideoSrc from '../../assets/oldman.mp4';
+
 const ParentDialogue = ({
   dialogues,
   currentDialogueIndex,
   onDialogueEnd,
   character = 'father',
-  videoSrc
+  videoSrc = defaultVideoSrc
 }) => {
   const [displayDialogue, setDisplayDialogue] = useState('');
   const [charIndex, setCharIndex] = useState(0);
@@ -137,31 +138,31 @@ const ParentDialogue = ({
       <div className="flex flex-col items-center gap-4 pt-3">
         {/* Character Video */}
   <div className="relative w-56 h-56 rounded-full overflow-hidden shadow-lg border-4 border-[#58cc02] hover:border-[#2fa946] transition-all transform hover:scale-105 bg-[#222] flex items-center justify-center">
-          {getVideoSrc() ? (
-            <video
-              ref={videoRef}
-              src={getVideoSrc()}
-              loop
-              autoPlay
-              muted
-              playsInline
-              className="w-full h-full object-cover aspect-square"
-              style={{ aspectRatio: '1/1', background: '#222' }}
-              onEnded={() => {
-                if (videoRef.current) {
-                  videoRef.current.currentTime = 0;
-                  videoRef.current.play();
-                }
-              }}
-              onError={e => {
-                // Hide video if error
-                e.target.style.display = 'none';
-              }}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-4xl text-[#58cc02] bg-[#222]">👴</div>
-          )}
-        </div>
+    {getVideoSrc() ? (
+      <video
+        ref={videoRef}
+        src={getVideoSrc()}
+        loop
+        autoPlay
+        muted
+        playsInline
+        className="w-full h-full object-cover aspect-square"
+        style={{ aspectRatio: '1/1', background: '#222' }}
+        onEnded={() => {
+          if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.play();
+          }
+        }}
+        onError={e => {
+          // Hide video if error
+          e.target.style.display = 'none';
+        }}
+      />
+    ) : (
+      <div className="w-full h-full flex items-center justify-center text-4xl text-[#58cc02] bg-[#222]">👴</div>
+    )}
+  </div>
 
         {/* Character Label */}
         <div className="bg-black rounded-lg shadow p-3 max-w-md w-full flex items-center justify-between">

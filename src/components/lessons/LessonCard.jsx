@@ -29,7 +29,7 @@ const LessonCard = ({ lesson, completed }) => {
       </div>
       
       <Link 
-        to={`/lessons/${lesson.id}`} 
+        to={lesson.link || `/lessons/${lesson.id}`} 
         className="block w-full text-center py-3 px-4 rounded-xl btn-primary"
       >
         {completed ? 'Review' : 'Start'}

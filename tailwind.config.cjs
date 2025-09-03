@@ -43,7 +43,8 @@ module.exports = {
         surface: '#1e2a3a'
       },
       fontFamily: {
-        sans: ['Poppins', 'sans-serif']
+        sans: ['Poppins', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif']
       },
       animation: {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',

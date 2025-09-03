@@ -1,6 +1,30 @@
 export const lessons = [
   {
     id: 1,
+    title: "Round 1: First Salary",
+    description: "Learn how to allocate your first salary and make job choices",
+    duration: "15 min",
+    difficulty: "Beginner",
+    xpReward: 50,
+    coinReward: 100,
+    icon: "💰",
+    category: "Income Management",
+    link: "/level11"
+  },
+  {
+    id: 2,
+    title: "Round 2: Monthly Expenses",
+    description: "Manage your monthly expenses including groceries, travel, lifestyle, and emergencies",
+    duration: "20 min",
+    difficulty: "Beginner",
+    xpReward: 75,
+    coinReward: 150,
+    icon: "🛒",
+    category: "Expense Management",
+    link: "/level12"
+  },
+  {
+    id: 3,
     title: "Budgeting Basics",
     description: "Learn how to create and maintain a personal budget",
     duration: "10 min",
@@ -11,7 +35,7 @@ export const lessons = [
     category: "Spending"
   },
   {
-    id: 2,
+    id: 4,
     title: "Understanding Credit",
     description: "What is credit and how does it work?",
     duration: "15 min",
@@ -22,7 +46,7 @@ export const lessons = [
     category: "Credit"
   },
   {
-    id: 3,
+    id: 5,
     title: "Introduction to Investing",
     description: "Start your investment journey with the basics",
     duration: "20 min",
@@ -33,7 +57,7 @@ export const lessons = [
     category: "Investing"
   },
   {
-    id: 4,
+    id: 6,
     title: "Saving Strategies",
     description: "Effective ways to save money for your goals",
     duration: "12 min",
@@ -44,7 +68,7 @@ export const lessons = [
     category: "Saving"
   },
   {
-    id: 5,
+    id: 7,
     title: "Debt Management",
     description: "How to manage and pay off debt effectively",
     duration: "18 min",
