@@ -14,7 +14,7 @@ body {
   font-family: 'Poppins', sans-serif;
   color: white;
   line-height: 1.6;
-  background-color: theme('colors.background.DEFAULT');
+  background-color: #1a1f2e; /* background.DEFAULT from your config */
   overflow-x: hidden;
 }
 
@@ -23,43 +23,216 @@ body {
   position: relative;
 }
 
-/* Game UI Elements */
-.game-card {
-  @apply bg-background-dark/80 backdrop-blur-md border border-accent/50 rounded-xl shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 hover:border-primary/50;
-}
+/* Define custom layer for your components */
+@layer components {
+  /* Game UI Elements */
+  .game-card {
+    background-color: rgba(17, 24, 39, 0.85); /* background-dark with 85% opacity */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(110, 255, 0, 0.3); /* primary-light with 30% opacity */
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(110, 255, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+    background-image: linear-gradient(135deg, rgba(110, 255, 0, 0.05), rgba(0, 225, 255, 0.03), rgba(255, 221, 0, 0.02));
+  }
+  .game-card:hover {
+    box-shadow: 0 25px 50px -12px rgba(110, 255, 0, 0.4);
+    border-color: rgba(110, 255, 0, 0.6);
+    transform: scale(1.02);
+  }
 
-.game-panel {
-  @apply bg-background-dark/80 backdrop-blur-md border border-accent/50 rounded-xl shadow-lg;
-}
+  .glass-card {
+    background-color: rgba(17, 24, 39, 0.7); /* background-dark with 70% opacity */
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(110, 255, 0, 0.2); /* primary-light with 20% opacity */
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(110, 255, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+    background-image: linear-gradient(135deg, rgba(110, 255, 0, 0.08), rgba(0, 225, 255, 0.06));
+  }
+  .glass-card:hover {
+    box-shadow: 0 20px 25px -5px rgba(110, 255, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba(110, 255, 0, 0.4);
+  }
 
-.game-button {
-  @apply px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-md;
-}
+  .neon-card {
+    background-color: rgba(17, 24, 39, 0.9); /* background-dark with 90% opacity */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 221, 0, 0.4); /* secondary-light with 40% opacity */
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(255, 221, 0, 0.3);
+    transition: all 0.3s;
+    background-image: linear-gradient(135deg, rgba(255, 221, 0, 0.08), rgba(255, 149, 0, 0.05));
+  }
+  .neon-card:hover {
+    box-shadow: 0 25px 50px -12px rgba(255, 221, 0, 0.5);
+    border-color: rgba(255, 221, 0, 0.7);
+  }
 
-/* Gradient Text */
-.gradient-text {
-  @apply bg-gradient-to-r from-primary-light to-primary bg-clip-text text-transparent;
-}
+  .game-panel {
+    background-color: rgba(17, 24, 39, 0.85); /* background-dark with 85% opacity */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 225, 255, 0.3); /* tertiary-light with 30% opacity */
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 225, 255, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    background-image: linear-gradient(135deg, rgba(0, 225, 255, 0.05), rgba(0, 163, 255, 0.03));
+  }
 
-.gradient-text-secondary {
-  @apply bg-gradient-to-r from-secondary-light to-secondary bg-clip-text text-transparent;
-}
+  .game-button {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    transform: translateX(0) translateY(0) rotate(0) skewX(0) skewY(0) scaleX(1) scaleY(1);
+  }
+  .game-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
 
-.gradient-text-tertiary {
-  @apply bg-gradient-to-r from-tertiary-light to-tertiary bg-clip-text text-transparent;
-}
+  /* Gradient Text */
+  .gradient-text {
+    background-image: linear-gradient(to right, #6eff00, #3dd958); /* primary-light to primary */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
-/* Gradient Buttons */
-.gradient-button-primary {
-  @apply px-6 py-2 bg-gradient-to-r from-primary-light to-primary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-primary/50 transition-all transform hover:scale-105;
-}
+  .gradient-text-secondary {
+    background-image: linear-gradient(to right, #ffdd00, #ff9500); /* secondary-light to secondary */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
-.gradient-button-secondary {
-  @apply px-6 py-2 bg-gradient-to-r from-secondary-light to-secondary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-secondary/50 transition-all transform hover:scale-105;
-}
+  .gradient-text-tertiary {
+    background-image: linear-gradient(to right, #00e1ff, #00a3ff); /* tertiary-light to tertiary */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
-.gradient-button-tertiary {
-  @apply px-6 py-2 bg-gradient-to-r from-tertiary-light to-tertiary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-tertiary/50 transition-all transform hover:scale-105;
+  /* Enhanced Gradient Buttons */
+  .gradient-button-primary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    background-image: linear-gradient(to right, #6eff00, #3dd958); /* primary-light to primary */
+    color: black;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    box-shadow: 0 0 20px rgba(110, 255, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+    transform: translateX(0) translateY(0) rotate(0) skewX(0) skewY(0) scaleX(1) scaleY(1);
+  }
+  .gradient-button-primary:hover {
+    box-shadow: 0 20px 25px -5px rgba(110, 255, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: scale(1.1);
+    filter: brightness(1.1);
+  }
+
+  .gradient-button-secondary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    background-image: linear-gradient(to right, #ffdd00, #ff9500); /* secondary-light to secondary */
+    color: black;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    box-shadow: 0 0 20px rgba(255, 221, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+    transform: translateX(0) translateY(0) rotate(0) skewX(0) skewY(0) scaleX(1) scaleY(1);
+  }
+  .gradient-button-secondary:hover {
+    box-shadow: 0 20px 25px -5px rgba(255, 221, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: scale(1.1);
+    filter: brightness(1.1);
+  }
+
+  .gradient-button-tertiary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    background-image: linear-gradient(to right, #00e1ff, #00a3ff); /* tertiary-light to tertiary */
+    color: black;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    box-shadow: 0 0 20px rgba(0, 225, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+    transform: translateX(0) translateY(0) rotate(0) skewX(0) skewY(0) scaleX(1) scaleY(1);
+  }
+  .gradient-button-tertiary:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 225, 255, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: scale(1.1);
+    filter: brightness(1.1);
+  }
+
+  /* Neon button styles */
+  .btn-neon-primary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background-color: transparent;
+    border: 2px solid #6eff00; /* primary-light */
+    color: #6eff00; /* primary-light */
+    border-radius: 0.5rem;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(110, 255, 0, 0.5);
+    text-shadow: 0 0 10px rgba(110, 255, 0, 0.8);
+    transition: all 0.3s;
+  }
+  .btn-neon-primary:hover {
+    background-color: #6eff00; /* primary-light */
+    color: black;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .btn-neon-secondary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background-color: transparent;
+    border: 2px solid #ffdd00; /* secondary-light */
+    color: #ffdd00; /* secondary-light */
+    border-radius: 0.5rem;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(255, 221, 0, 0.5);
+    text-shadow: 0 0 10px rgba(255, 221, 0, 0.8);
+    transition: all 0.3s;
+  }
+  .btn-neon-secondary:hover {
+    background-color: #ffdd00; /* secondary-light */
+    color: black;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .btn-neon-tertiary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background-color: transparent;
+    border: 2px solid #00e1ff; /* tertiary-light */
+    color: #00e1ff; /* tertiary-light */
+    border-radius: 0.5rem;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(0, 225, 255, 0.5);
+    text-shadow: 0 0 10px rgba(0, 225, 255, 0.8);
+    transition: all 0.3s;
+  }
+  .btn-neon-tertiary:hover {
+    background-color: #00e1ff; /* tertiary-light */
+    color: black;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
 }
 
 /* Scrollbar Styling */
@@ -68,14 +241,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: theme('colors.background.dark');
+  background: #111827; /* background-dark from your config */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: theme('colors.primary.light');
+  background: #6eff00; /* primary-light from your config */
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: theme('colors.primary.DEFAULT');
+  background: #3dd958; /* primary from your config */
 }

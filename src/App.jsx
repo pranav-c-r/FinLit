@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
@@ -13,17 +13,60 @@ import Goals from './pages/Goals';
 import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
 import PiggyBank from './pages/PiggyBank';
-import DailyQuests from './pages/DailyQuests';
-import ExpenseTracker from './pages/ExpenseTracker';
+import ExpenseTracker from './components/expenses/ExpenseTracker';
+import DailyQuests from './components/quests/DailyQuests';
 import Rewards from './pages/Rewards';
 import Social from './pages/Social';
 import Achievements from './pages/Achievements';
+import LevelOverview from './pages/LevelOverview';
 
 import './App.css';
 import './styles/globals.css';
 import SignIn from './pages/signIn';
-import Level11 from './pages/Level1/round1';
-import Level12 from './pages/Level1/round2';
+
+// Level 1 imports
+import Round1 from './pages/Level1/round1';
+import Round2 from './pages/Level1/round2';
+import Round3 from './pages/Level1/round3';
+import Round4 from './pages/Level1/round4';
+import Round5 from './pages/Level1/round5';
+import Round6 from './pages/Level1/round6';
+import Level1Overview from './pages/Level1';
+
+// Level 2 imports
+import Round1Level2 from './pages/Level2/round1';
+import Round2Level2 from './pages/Level2/round2';
+import Round3Level2 from './pages/Level2/round3';
+import Round4Level2 from './pages/Level2/round4';
+import Round5Level2 from './pages/Level2/round5';
+import Round6Level2 from './pages/Level2/round6';
+import Level2Overview from './pages/Level2';
+
+// Level 3 imports
+import Round1Level3 from './pages/Level3/round1';
+import Round2Level3 from './pages/Level3/round2';
+import Round3Level3 from './pages/Level3/round3';
+import Round4Level3 from './pages/Level3/round4';
+import Round5Level3 from './pages/Level3/round5';
+import Level3Overview from './pages/Level3';
+
+// Level 4 imports
+import Round1Level4 from './pages/Level4/round1';
+import Round2Level4 from './pages/Level4/round2';
+import Round3Level4 from './pages/Level4/round3';
+import Round4Level4 from './pages/Level4/round4';
+import Round5Level4 from './pages/Level4/round5';
+import Round6Level4 from './pages/Level4/round6';
+import Level4Overview from './pages/Level4'; // Make sure this component exists
+
+// Level 5 imports
+import Round1Level5 from './pages/Level5/round1';
+import Round2Level5 from './pages/Level5/round2';
+import Round3Level5 from './pages/Level5/round3';
+import Round4Level5 from './pages/Level5/round4';
+import Round5Level5 from './pages/Level5/round5';
+import Round6Level5 from './pages/Level5/round6';
+import Level5Overview from './pages/Level5'; // Make sure this component exists
 
 // Game UI Background
 const GameBackground = () => {
@@ -35,19 +78,18 @@ const GameBackground = () => {
 };
 
 // Create a layout component for authenticated routes
-const AuthenticatedLayout = ({ children }) => {
+const AuthenticatedLayout = ({ children, isSidebarOpen, toggleSidebar }) => {
   return (
     <div className="App">
       <GameBackground />
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div className="app-content">
-        <Header />
+        <Header toggleSidebar={toggleSidebar} />
         <main className="main-content mx-4 my-4 p-4">
           {children}
         </main>
         <Footer />
       </div>
-      <Navigation />
     </div>
   );
 };
@@ -55,104 +97,289 @@ const AuthenticatedLayout = ({ children }) => {
 // Create a layout for public routes (no sidebar/navigation)
 const PublicLayout = ({ children, path }) => {
   return (
-    <div className="App">
+    <div className="App public-layout-container">
       <GameBackground />
       <div className="app-content">
-        <main className="main-content public-layout">
+        <main className="main-content public-layout landing-page">
           {children}
         </main>
         {/* Don't include Footer on Landing page as it has its own footer */}
-        {path !== '/' && <Footer />}
+        {path !== '/landing' && <Footer />}
       </div>
     </div>
   );
 };
 
 function App() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+  
   return (
     <AppProvider>
       <Router>
         <Routes>
-          {/* Public routes without sidebar/navigation */}
-          <Route path="/" element={
-            <PublicLayout path="/">
+          {/* Redirect from root to landing page */}
+          <Route path="/" element={<Navigate to="/landing" replace />} />
+          
+          <Route path="/landing" element={
+            <PublicLayout path="/landing">
               <Landing />
             </PublicLayout>
           } />
-          <Route path="/level11" element={
-            <PublicLayout path="/level11">
-              <Level11 />
-            </PublicLayout>
+          
+          <Route path="/levels" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <LevelOverview />
+            </AuthenticatedLayout>
           } />
-          <Route path="/level12" element={
-            <PublicLayout path="/level12">
-              <Level12 />
-            </PublicLayout>
+          
+          {/* Level 1 Routes */}
+          <Route path="/level1" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Level1Overview />
+            </AuthenticatedLayout>
           } />
+          <Route path="/level1/round1" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round1 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level1/round2" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level1/round3" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round3 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level1/round4" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round4 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level1/round5" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round5 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level1/round6" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round6 />
+            </AuthenticatedLayout>
+          } />
+
+          {/* Level 2 Routes */}
+          <Route path="/level2" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Level2Overview />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round1" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round1Level2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round2" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round2Level2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round3" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round3Level2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round4" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round4Level2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round5" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round5Level2 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level2/round6" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round6Level2 />
+            </AuthenticatedLayout>
+          } />
+
+          {/* Level 3 Routes */}
+          <Route path="/level3" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Level3Overview />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level3/round1" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round1Level3 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level3/round2" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round2Level3 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level3/round3" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round3Level3 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level3/round4" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round4Level3 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level3/round5" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round5Level3 />
+            </AuthenticatedLayout>
+          } />
+
+          {/* Level 4 Routes - Updated to match pattern */}
+          <Route path="/level4" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Level4Overview />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level4/round1" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round1Level4 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level4/round2" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round2Level4 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level4/round3" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round3Level4 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level4/round4" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round4Level4 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level4/round5" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round5Level4 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level4/round6" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round6Level4 />
+            </AuthenticatedLayout>
+          } />
+
+          {/* Level 5 Routes - Updated to match pattern */}
+          <Route path="/level5" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Level5Overview />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level5/round1" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round1Level5 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level5/round2" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round2Level5 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level5/round3" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round3Level5 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level5/round4" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round4Level5 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level5/round5" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round5Level5 />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/level5/round6" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
+              <Round6Level5 />
+            </AuthenticatedLayout>
+          } />
+
           <Route path="/signin" element={
             <PublicLayout path="/signin">
               <SignIn />
             </PublicLayout>
           } />
 
-          {/* Authenticated routes with sidebar/navigation */}
+          {/* Other authenticated routes */}
           <Route path="/home" element={
-            <AuthenticatedLayout>
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Home />
             </AuthenticatedLayout>
           } />
           <Route path="/lessons" element={
-            <AuthenticatedLayout>
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Lessons />
             </AuthenticatedLayout>
           } />
           <Route path="/challenges" element={
-            <AuthenticatedLayout>
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Challenges />
             </AuthenticatedLayout>
           } />
           <Route path="/goals" element={
-            <AuthenticatedLayout>
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Goals />
             </AuthenticatedLayout>
           } />
           <Route path="/leaderboard" element={
-            <AuthenticatedLayout>
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Leaderboard />
             </AuthenticatedLayout>
           } />
           <Route path="/profile" element={
-            <AuthenticatedLayout>
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Profile />
             </AuthenticatedLayout>
           } />
-          <Route path="/piggybank" element={
-            <AuthenticatedLayout>
+          <Route path="/piggy-bank" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <PiggyBank />
             </AuthenticatedLayout>
           } />
           <Route path="/daily-quests" element={
-            <AuthenticatedLayout>
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <DailyQuests />
             </AuthenticatedLayout>
           } />
-          <Route path="/expenses" element={
-            <AuthenticatedLayout>
+          <Route path="/expense-tracker" element={
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <ExpenseTracker />
             </AuthenticatedLayout>
           } />
           <Route path="/rewards" element={
-            <AuthenticatedLayout>
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Rewards />
             </AuthenticatedLayout>
           } />
           <Route path="/social" element={
-            <AuthenticatedLayout>
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Social />
             </AuthenticatedLayout>
           } />
           <Route path="/achievements" element={
-            <AuthenticatedLayout>
+            <AuthenticatedLayout isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
               <Achievements />
             </AuthenticatedLayout>
           } />
