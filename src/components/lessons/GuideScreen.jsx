@@ -144,11 +144,8 @@ const GuideScreen = ({ onNext }) => {
         <div className="absolute bottom-1/4 right-1/4 w-72 sm:w-96 h-72 sm:h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 right-1/3 w-56 sm:w-64 h-56 sm:h-64 bg-green-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
-
-      {/* Main content */}
       <div className="relative z-10 w-full max-w-4xl flex flex-col items-center justify-center text-center space-y-6 sm:space-y-10">
         
-        {/* Mascot */}
         <div className="w-full max-w-md bg-white/5 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl mx-auto">
           <TalkingMascot
             mascotVideoSrc={mascotVideoSrc}

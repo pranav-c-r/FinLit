@@ -250,35 +250,19 @@ const Level11 = () => {
   // Save user progress to Firebase
   const saveUserProgress = async () => {
     if (!auth.currentUser) return;
-    
     try {
-      const userProgressRef = doc(database, "Users", auth.currentUser.uid);
-      const userProgressRef2 = doc(userProgressRef, "UserProgress");
-      const docSnap = await getDoc(userProgressRef, "UserProgress");
-      const docSnap2 = await getDoc(userProgressRef);
-      if (docSnap.exists()) {
-        await updateDoc(userProgressRef2, {
-          "level1.round1": userChoices
-        });
-      } else {
-        await setDoc(userProgressRef, {
-          "level1": {
-            "round1": userChoices
-          }
-        });
+      // Save round1 at Users/{uid}/UserProgress/Level1/round1
+      const round1Ref = doc(database, "Users", auth.currentUser.uid, "UserProgress", "Level1");
+      const round1Doc = await getDoc(round1Ref);
+      let dataToUpdate = {};
+      if (round1Doc.exists()) {
+        dataToUpdate = round1Doc.data();
       }
-      if (docSnap2.exists()) {
-        await updateDoc(userProgressRef, {
-          "level":1,
-          "round":1
-        });
-      } else {
-        await setDoc(userProgressRef, {
-          "level1": {
-            "round1": userChoices
-          }
-        });
-      }
+      dataToUpdate.round1 = userChoices;
+      await setDoc(round1Ref, dataToUpdate, { merge: true });
+      // Update level and round at Users/{uid}
+      const userRef = doc(database, "Users", auth.currentUser.uid);
+      await updateDoc(userRef, { level: 1, round: 1 });
       console.log("Progress saved successfully");
     } catch (error) {
       console.error("Error saving progress:", error);
@@ -442,7 +426,19 @@ const Level11 = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a1f2e] to-[#111827] text-white overflow-hidden">
       {/* Show intro modal first */}
-      {showIntro && <RoundIntroModal onClose={handleStartJourney} />}
+      {showIntro && (
+        <RoundIntroModal 
+          onButtonClick={handleStartJourney}
+          roundNumber={1}
+          title="Round 1: First Job & Salary"
+          description="In this round, you'll discover how your first job choice shapes your entire financial future. Every decision has trade-offs — stability vs. growth, immediate money vs. long-term potential."
+          challenges={[
+            "Choose your first job (risk/reward trade-offs)",
+            "Decide what to do with your first salary",
+            "Handle an unexpected financial situation"
+          ]}
+        />
+      )}
       
       {/* Show guide screen after modal closes */}
       {showGuide && <GuideScreen onNext={handleContinue} />}
@@ -496,6 +492,7 @@ const Level11 = () => {
                       currentDialogueIndex={currentDialogueIndex}
                       onDialogueEnd={handleParentDialogueEnd}
                       character="father"
+                      videoSrc={oldManVideoSrc}
                     />
                   ) : (
                     <MascotDialogue

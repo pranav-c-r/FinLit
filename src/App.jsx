@@ -17,6 +17,7 @@ import './App.css';
 import './styles/globals.css';
 import SignIn from './pages/signIn';
 import Level11 from './pages/Level1/round1';
+import Level12 from './pages/Level1/round2';
 
 // Animated Background Component
 const AnimatedBackground = () => {
@@ -32,7 +33,7 @@ const AnimatedBackground = () => {
 // Create a layout component for authenticated routes
 const AuthenticatedLayout = ({ children }) => {
   return (
-    <div className="App">
+    <div className="App font-poppins">
       <AnimatedBackground />
       <Sidebar />
       <div className="app-content">
@@ -50,7 +51,7 @@ const AuthenticatedLayout = ({ children }) => {
 // Create a layout for public routes (no sidebar/navigation)
 const PublicLayout = ({ children, path }) => {
   return (
-    <div className="App">
+    <div className="App font-poppins">
       <AnimatedBackground />
       <main className="main-content public-layout">
         {children}
@@ -75,6 +76,11 @@ function App() {
           <Route path="/level11" element={
             <PublicLayout path="/level11">
               <Level11 />
+            </PublicLayout>
+          } />
+          <Route path="/level12" element={
+            <PublicLayout path="/level12">
+              <Level12 />
             </PublicLayout>
           } />
           <Route path="/signin" element={
