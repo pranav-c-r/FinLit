@@ -1,6 +1,6 @@
 import React from 'react';
 
-const RoundIntroModal = ({ title, description, buttonText, onButtonClick, challenges, roundNumber = 1 }) => (
+const RoundIntroModal = ({ title, description, buttonText, onButtonClick, onClose, challenges, roundNumber = 1 }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#01110A] bg-opacity-40">
     <div className="bg-[#0A1F14] rounded-2xl shadow-lg max-w-md w-full px-6 py-8 relative flex flex-col gap-6 animate-fadeInUp border border-[#1C3B2A]">
       {/* Header: Age & Round */}

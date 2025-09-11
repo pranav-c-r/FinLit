@@ -9,47 +9,83 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 const ExpenseTracker = () => {
   const { state, dispatch } = useApp();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [transactionType, setTransactionType] = useState('expense');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [filterMonth, setFilterMonth] = useState(new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0'));
 
+  useEffect(() => {
+    // Any side effects related to filterMonth can go here if needed
+    // For now, just re-render by state update
+  }, [filterMonth]);
+
   const handleAddExpense = (e) => {
     e.preventDefault();
     if (!amount || !description || !selectedCategory) return;
 
-    const newExpense = {
+    const newTransaction = {
+      id: Date.now().toString(),
       category: selectedCategory,
       amount: parseFloat(amount),
       description,
       date,
-      subcategory: 'Other'
+      subcategory: 'Other',
+      type: transactionType
     };
 
     dispatch({
       type: 'ADD_EXPENSE',
-      payload: newExpense
+      payload: newTransaction
     });
 
     // Reset form
     setAmount('');
     setDescription('');
     setSelectedCategory('');
+    setTransactionType('expense');
     setShowAddForm(false);
   };
 
-  const getFilteredExpenses = () => {
-    const [year, month] = filterMonth.split('-');
-    return state.expenses.filter(expense => {
-      const expenseDate = new Date(expense.date);
-      return expenseDate.getFullYear() === parseInt(year) && 
-             expenseDate.getMonth() === parseInt(month) - 1;
+  const handleDeleteExpense = (id) => {
+    dispatch({
+      type: 'DELETE_EXPENSE',
+      payload: id
     });
+  };
+
+  const getFilteredTransactions = () => {
+    const [year, month] = filterMonth.split('-');
+    return state.expenses.filter(transaction => {
+      const transactionDate = new Date(transaction.date);
+      return transactionDate.getFullYear() === parseInt(year) && 
+             transactionDate.getMonth() === parseInt(month) - 1;
+    });
+  };
+
+  const getFilteredExpenses = () => {
+    return getFilteredTransactions().filter(transaction => 
+      transaction.type === 'expense' || !transaction.type
+    );
+  };
+
+  const getFilteredIncome = () => {
+    return getFilteredTransactions().filter(transaction => 
+      transaction.type === 'income'
+    );
   };
 
   const getTotalExpenses = () => {
     return getFilteredExpenses().reduce((total, expense) => total + expense.amount, 0);
+  };
+
+  const getTotalIncome = () => {
+    return getFilteredIncome().reduce((total, income) => total + income.amount, 0);
+  };
+
+  const getBalance = () => {
+    return getTotalIncome() - getTotalExpenses();
   };
 
   const getExpensesByCategory = () => {
@@ -182,6 +218,25 @@ const ExpenseTracker = () => {
           </div>
 
           <form onSubmit={handleAddExpense} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Transaction Type</label>
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => setTransactionType('expense')}
+                  className={`py-2 px-4 rounded-lg font-medium transition-all duration-200 ${transactionType === 'expense' ? 'bg-red-500 text-white' : 'bg-background-light text-gray-300 border border-accent/30'}`}
+                >
+                  Expense
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTransactionType('income')}
+                  className={`py-2 px-4 rounded-lg font-medium transition-all duration-200 ${transactionType === 'income' ? 'bg-green-500 text-white' : 'bg-background-light text-gray-300 border border-accent/30'}`}
+                >
+                  Income
+                </button>
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
               <select
@@ -378,23 +433,29 @@ const ExpenseTracker = () => {
       <div className="bg-background-dark/50 p-6 rounded-lg border border-accent/30">
         <h3 className="text-lg font-semibold text-white mb-4">Recent Expenses</h3>
         <div className="space-y-3">
-          {getFilteredExpenses().length > 0 ? (
-            getFilteredExpenses()
+          {getFilteredTransactions().length > 0 ? (
+            getFilteredTransactions()
               .sort((a, b) => new Date(b.date) - new Date(a.date))
               .slice(0, 10)
-              .map((expense, index) => (
+              .map((transaction, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-background-light/20 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <div className="text-2xl">{getCategoryById(expense.category)?.icon || '💰'}</div>
+                    <div className="text-2xl">{getCategoryById(transaction.category)?.icon || (transaction.type === 'income' ? '💸' : '💰')}</div>
                     <div>
-                      <p className="text-white font-medium">{expense.description}</p>
+                      <p className="text-white font-medium">{transaction.description}</p>
                       <p className="text-gray-400 text-sm">
-                        {getCategoryById(expense.category)?.name || expense.category} • {new Date(expense.date).toLocaleDateString()}
+                        {getCategoryById(transaction.category)?.name || transaction.category} • {new Date(transaction.date).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-white font-semibold">₹{expense.amount.toFixed(2)}</p>
+                  <div className="flex items-center">
+                    <p className="text-white font-semibold mr-4">₹{transaction.amount.toFixed(2)}</p>
+                    <button
+                      onClick={() => handleDeleteExpense(transaction.id)}
+                      className="text-red-500 hover:text-red-700 text-sm"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))

@@ -20,7 +20,7 @@ const Lessons = () => {
 
     // Filter by difficulty
     if (selectedDifficulty !== 'all') {
-      lessons = lessons.filter(lesson => lesson.difficulty === selectedDifficulty);
+      lessons = lessons.filter(lesson => lezsson.difficulty === selectedDifficulty);
     }
 
     // Filter by category

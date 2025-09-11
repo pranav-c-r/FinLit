@@ -47,8 +47,8 @@ const LevelOverview = () => {
 
   const isRoundUnlocked = (levelId, roundNumber) => {
     if (!userProgress) return false;
-    // Always unlock Level 1 Round 1
-    if (levelId === 1 && roundNumber === 1) return true;
+    // Always unlock Level 1 Round 1 and Round 2
+    if ((levelId === 1 && (roundNumber === 1 || roundNumber === 2)) || (levelId === 2 && roundNumber === 2)) return true;
     const { level, round } = userProgress;
 
     if (levelId < level) return true; // Previous levels are unlocked

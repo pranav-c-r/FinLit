@@ -6,7 +6,7 @@ const Header = ({ toggleSidebar }) => {
   const { user } = state;
   const [isExpanded, setIsExpanded] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const progress = (user.xp / user.nextLevelXp) * 100;
+  const progress = user && user.nextLevelXp ? (user.xp / user.nextLevelXp) * 100 : 0;
 
   // Simulate a new notification
   useEffect(() => {
