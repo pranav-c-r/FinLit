@@ -348,6 +348,11 @@ function appReducer(state, action) {
         ...state,
         expenses: [...state.expenses, action.payload]
       };
+    case 'ADD_INCOME':
+      return {
+        ...state,
+        expenses: [...state.expenses, {...action.payload, type: 'income'}]
+      };
     case 'UPDATE_EXPENSE':
       return {
         ...state,
