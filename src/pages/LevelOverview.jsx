@@ -47,7 +47,7 @@ const LevelOverview = () => {
 
   const isRoundUnlocked = (levelId, roundNumber) => {
     if (!userProgress) return false;
-    // Always unlock Level 1 Round 1 and Round 2
+    // Lock Round 1 but keep Round 2 unlocked for Level 1
     if ((levelId === 1 && (roundNumber === 1 || roundNumber === 2)) || (levelId === 2 && roundNumber === 2)) return true;
     const { level, round } = userProgress;
 
@@ -127,7 +127,14 @@ const LevelOverview = () => {
               {Array.from({ length: level.rounds }).map((_, idx) => {
                 const roundNumber = idx + 1;
                 const unlocked = isRoundUnlocked(level.id, roundNumber);
-                const roundLink = `/level${level.id}/round${roundNumber}`;
+                let roundLink = `/level${level.id}/round${roundNumber}`;
+                if (level.id === 1) {
+                  if (roundNumber === 1) {
+                    roundLink = `/level1/round2`;
+                  } else if (roundNumber === 2) {
+                    roundLink = `/level1/round3`;
+                  }
+                }
 
                 const stoneClasses = `
                   relative w-28 h-28 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 transform
